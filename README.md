@@ -72,4 +72,11 @@ npm run start
 - `app/logout/`: Sign-out handling and confirmation page.
 - `components/`: Responsive layout shell, desktop sidebar navigation, and mobile bottom navigation.
 - `lib/supabase/`: Supabase client helpers for browser, server components, and middleware using `@supabase/ssr`.
-- `middleware.ts`: Route protection guard redirecting unauthenticated traffic to `/login`.
+- `proxy.ts`: Route protection guard. All routes except `/login` require authentication; unauthenticated traffic is redirected to `/login`.
+## Database migrations
+
+- Migrations in `supabase/migrations` are applied in filename order.
+- So far they were applied manually through the Supabase SQL Editor.
+- `supabase/tests/rls_isolation.sql` must pass after every schema change.
+- Every new table must have RLS enabled, explicit grants and policies.
+

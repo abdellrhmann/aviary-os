@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, Bird, LogOut } from "lucide-react";
+import { LayoutDashboard, Bird, Dna, MapPin, LogOut } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 interface NavItem {
@@ -14,6 +14,8 @@ interface NavItem {
 const navItems: NavItem[] = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
   { name: "Birds", href: "/birds", icon: Bird },
+  { name: "Species", href: "/species", icon: Dna },
+  { name: "Locations", href: "/locations", icon: MapPin },
 ];
 
 export function SidebarNav() {
@@ -98,7 +100,7 @@ export function MobileBottomNav() {
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-surface border-t border-border">
-      <div className="grid grid-cols-3 h-14">
+      <div className="grid grid-cols-4 h-14">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive =
@@ -121,13 +123,6 @@ export function MobileBottomNav() {
             </Link>
           );
         })}
-        <Link
-          href="/logout"
-          className="flex flex-col items-center justify-center gap-1 py-1 text-xs text-muted hover:text-foreground transition-colors"
-        >
-          <LogOut className="w-4 h-4 shrink-0" />
-          <span className="text-[11px] leading-tight">Log out</span>
-        </Link>
       </div>
     </nav>
   );

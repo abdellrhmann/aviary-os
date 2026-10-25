@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { LayoutDashboard, Bird, Dna, MapPin, LogOut } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { LanguageSwitcher } from "@/components/language-switcher";
 
 interface NavItem {
   name: string;
@@ -30,7 +31,7 @@ export function SidebarNav() {
   }
 
   return (
-    <aside className="hidden md:flex md:w-60 md:flex-col md:fixed md:inset-y-0 bg-surface border-r border-border">
+    <aside className="hidden md:flex md:w-60 md:flex-col md:fixed md:inset-y-0 bg-surface border-e border-border">
       <div className="flex flex-col flex-1 min-h-0">
         <div className="flex items-center h-14 px-5 border-b border-border">
           <span className="text-sm font-semibold tracking-tight text-foreground">
@@ -50,11 +51,10 @@ export function SidebarNav() {
               <Link
                 key={item.name}
                 href={item.href}
-                className={`flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors ${
-                  isActive
+                className={`flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors ${isActive
                     ? "bg-accent-subtle text-accent font-medium"
                     : "text-muted hover:text-foreground hover:bg-muted-surface"
-                }`}
+                  }`}
               >
                 <Icon className="w-4 h-4 shrink-0" />
                 <span>{item.name}</span>
@@ -63,11 +63,12 @@ export function SidebarNav() {
           })}
         </nav>
 
-        <div className="p-3 border-t border-border">
+        <div className="p-3 border-t border-border space-y-2">
+          <LanguageSwitcher className="w-full" />
           <button
             type="button"
             onClick={handleLogout}
-            className="flex items-center gap-3 w-full px-3 py-2 text-sm text-muted hover:text-foreground hover:bg-muted-surface rounded-md transition-colors text-left"
+            className="flex items-center gap-3 w-full px-3 py-2 text-sm text-muted hover:text-foreground hover:bg-muted-surface rounded-md transition-colors text-start"
           >
             <LogOut className="w-4 h-4 shrink-0" />
             <span>Log out</span>
@@ -84,13 +85,16 @@ export function MobileHeader() {
       <span className="text-sm font-semibold tracking-tight text-foreground">
         AviaryOS
       </span>
-      <Link
-        href="/logout"
-        className="flex items-center gap-1.5 text-xs text-muted hover:text-foreground px-2.5 py-1.5 rounded-sm border border-border bg-surface"
-      >
-        <LogOut className="w-3.5 h-3.5" />
-        <span>Log out</span>
-      </Link>
+      <div className="flex items-center gap-2">
+        <LanguageSwitcher />
+        <Link
+          href="/logout"
+          className="flex items-center gap-1.5 text-xs text-muted hover:text-foreground px-2.5 py-1.5 rounded-sm border border-border bg-surface"
+        >
+          <LogOut className="w-3.5 h-3.5" />
+          <span>Log out</span>
+        </Link>
+      </div>
     </header>
   );
 }
@@ -112,11 +116,10 @@ export function MobileBottomNav() {
             <Link
               key={item.name}
               href={item.href}
-              className={`flex flex-col items-center justify-center gap-1 py-1 text-xs transition-colors ${
-                isActive
+              className={`flex flex-col items-center justify-center gap-1 py-1 text-xs transition-colors ${isActive
                   ? "text-accent font-medium"
                   : "text-muted hover:text-foreground"
-              }`}
+                }`}
             >
               <Icon className="w-4 h-4 shrink-0" />
               <span className="text-[11px] leading-tight">{item.name}</span>

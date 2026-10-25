@@ -2,10 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
+import { LanguageSwitcher } from "@/components/language-switcher";
 
 export default function LoginPage() {
   const router = useRouter();
+  const t = useTranslations("Login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [mode, setMode] = useState<"signin" | "signup">("signin");
@@ -48,19 +51,21 @@ export default function LoginPage() {
           return;
         }
 
-        setInfoMessage(
-          "Registration submitted. If email confirmation is required, please verify your email before signing in."
-        );
+        setInfoMessage(t("registrationSubmitted"));
         setIsLoading(false);
       }
     } catch {
-      setErrorMessage("An unexpected error occurred during authentication.");
+      setErrorMessage(t("unexpectedError"));
       setIsLoading(false);
     }
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+      <div className="fixed top-4 end-4">
+        <LanguageSwitcher />
+      </div>
+
       <div className="w-full max-w-sm bg-surface border border-border rounded-md p-6 sm:p-8">
         <div className="border-b border-border pb-4 mb-6">
           <h1 className="text-base font-semibold tracking-tight text-foreground">
@@ -68,8 +73,8 @@ export default function LoginPage() {
           </h1>
           <p className="text-xs text-muted mt-1">
             {mode === "signin"
-              ? "Sign in to access your aviary management workspace."
-              : "Create an account to start managing your aviary records."}
+              ? t("subtitleSignIn")
+              : t("subtitleSignUp")}
           </p>
         </div>
 
@@ -91,7 +96,7 @@ export default function LoginPage() {
               htmlFor="email"
               className="block text-xs font-medium text-foreground mb-1"
             >
-              Email address
+              {t("email")}
             </label>
             <input
               id="email"
@@ -102,7 +107,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-3 py-2 text-sm bg-surface text-foreground border border-border rounded-md focus:outline-none focus:border-accent"
-              placeholder="user@example.com"
+              placeholder={t("emailPlaceholder")}
             />
           </div>
 
@@ -111,7 +116,7 @@ export default function LoginPage() {
               htmlFor="password"
               className="block text-xs font-medium text-foreground mb-1"
             >
-              Password
+              {t("password")}
             </label>
             <input
               id="password"
@@ -134,10 +139,10 @@ export default function LoginPage() {
             className="w-full py-2 px-4 text-xs font-medium bg-accent text-accent-foreground hover:bg-accent-hover rounded-md transition-colors disabled:opacity-60"
           >
             {isLoading
-              ? "Processing..."
+              ? t("processing")
               : mode === "signin"
-              ? "Sign in"
-              : "Register"}
+              ? t("signIn")
+              : t("register")}
           </button>
         </form>
 
@@ -152,11 +157,12 @@ export default function LoginPage() {
             className="text-xs text-muted hover:text-foreground transition-colors underline"
           >
             {mode === "signin"
-              ? "Need an account? Register"
-              : "Already have an account? Sign in"}
+              ? t("needAccount")
+              : t("haveAccount")}
           </button>
         </div>
       </div>
     </div>
   );
 }
+

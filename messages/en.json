@@ -3,5 +3,19 @@
         "appName": "AviaryOS",
         "save": "Save",
         "cancel": "Cancel"
+    },
+    "Login": {
+        "subtitleSignIn": "Sign in to access your aviary management workspace.",
+        "subtitleSignUp": "Create an account to start managing your aviary records.",
+        "email": "Email address",
+        "emailPlaceholder": "user@example.com",
+        "password": "Password",
+        "signIn": "Sign in",
+        "register": "Register",
+        "processing": "Processing...",
+        "needAccount": "Need an account? Register",
+        "haveAccount": "Already have an account? Sign in",
+        "registrationSubmitted": "Registration submitted. If email confirmation is required, please verify your email before signing in.",
+        "unexpectedError": "An unexpected error occurred during authentication."
     }
-}
+}

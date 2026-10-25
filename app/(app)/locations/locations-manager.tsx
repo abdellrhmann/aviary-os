@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { Plus, Pencil, Trash2, X, Check, AlertCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { Location } from "@/lib/validation/locations";
 import {
   createLocationAction,
@@ -14,6 +15,9 @@ interface LocationsManagerProps {
 }
 
 export function LocationsManager({ initialLocations }: LocationsManagerProps) {
+  const t = useTranslations("Locations");
+  const tCommon = useTranslations("Common");
+
   // Add form state
   const [showAddForm, setShowAddForm] = useState(false);
   const [addName, setAddName] = useState("");
@@ -86,7 +90,7 @@ export function LocationsManager({ initialLocations }: LocationsManagerProps) {
       });
 
       if (!result.success) {
-        setAddError(result.error || "Failed to create location.");
+        setAddError(result.error || t("createError"));
         if (result.fieldErrors) {
           setAddFieldErrors(result.fieldErrors);
         }
@@ -110,7 +114,7 @@ export function LocationsManager({ initialLocations }: LocationsManagerProps) {
       });
 
       if (!result.success) {
-        setEditError(result.error || "Failed to update location.");
+        setEditError(result.error || t("updateError"));
         if (result.fieldErrors) {
           setEditFieldErrors(result.fieldErrors);
         }
@@ -128,7 +132,7 @@ export function LocationsManager({ initialLocations }: LocationsManagerProps) {
       const result = await deleteLocationAction(id);
 
       if (!result.success) {
-        setDeleteError(result.error || "Failed to delete location.");
+        setDeleteError(result.error || t("deleteError"));
         return;
       }
 
@@ -142,11 +146,10 @@ export function LocationsManager({ initialLocations }: LocationsManagerProps) {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border pb-4">
         <div>
           <h1 className="text-xl font-semibold tracking-tight text-foreground">
-            Locations
+            {t("title")}
           </h1>
           <p className="text-sm text-muted mt-1">
-            Manage aviaries, breeding cages, flight enclosures, and quarantine
-            facilities.
+            {t("description")}
           </p>
         </div>
         <div>
@@ -162,12 +165,12 @@ export function LocationsManager({ initialLocations }: LocationsManagerProps) {
             {showAddForm ? (
               <>
                 <X className="w-4 h-4" />
-                <span>Close form</span>
+                <span>{tCommon("closeForm")}</span>
               </>
             ) : (
               <>
                 <Plus className="w-4 h-4" />
-                <span>Add location</span>
+                <span>{t("addLocation")}</span>
               </>
             )}
           </button>
@@ -179,10 +182,10 @@ export function LocationsManager({ initialLocations }: LocationsManagerProps) {
         <div className="bg-surface border border-border rounded-md p-4 sm:p-5">
           <div className="border-b border-border pb-3 mb-4">
             <h2 className="text-sm font-semibold text-foreground">
-              New Location Record
+              {t("newRecord")}
             </h2>
             <p className="text-xs text-muted mt-0.5">
-              Enter location details. Name is required.
+              {t("newRecordDescription")}
             </p>
           </div>
 
@@ -199,7 +202,7 @@ export function LocationsManager({ initialLocations }: LocationsManagerProps) {
                 htmlFor="add-location-name"
                 className="block text-xs font-medium text-foreground mb-1"
               >
-                Location name <span className="text-danger">*</span>
+                {t("locationName")} <span className="text-danger">*</span>
               </label>
               <input
                 id="add-location-name"
@@ -208,7 +211,7 @@ export function LocationsManager({ initialLocations }: LocationsManagerProps) {
                 maxLength={100}
                 value={addName}
                 onChange={(e) => setAddName(e.target.value)}
-                placeholder="e.g. Aviary A - East Flight"
+                placeholder={t("locationNamePlaceholder")}
                 className="w-full text-sm px-3 py-2 bg-surface border border-border rounded-md text-foreground placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent"
               />
               {addFieldErrors.name && (
@@ -223,7 +226,7 @@ export function LocationsManager({ initialLocations }: LocationsManagerProps) {
                 htmlFor="add-location-notes"
                 className="block text-xs font-medium text-foreground mb-1"
               >
-                Notes
+                {tCommon("notes")}
               </label>
               <textarea
                 id="add-location-notes"
@@ -231,7 +234,7 @@ export function LocationsManager({ initialLocations }: LocationsManagerProps) {
                 maxLength={1000}
                 value={addNotes}
                 onChange={(e) => setAddNotes(e.target.value)}
-                placeholder="Optional facility dimensions, lighting, or usage notes..."
+                placeholder={t("notesPlaceholder")}
                 className="w-full text-sm px-3 py-2 bg-surface border border-border rounded-md text-foreground placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent resize-y"
               />
               {addFieldErrors.notes && (
@@ -248,14 +251,14 @@ export function LocationsManager({ initialLocations }: LocationsManagerProps) {
                 disabled={isPendingAdd}
                 className="inline-flex items-center justify-center text-xs font-medium bg-surface text-foreground hover:bg-muted-surface border border-border px-3 py-2 rounded-md transition-colors"
               >
-                Cancel
+                {tCommon("cancel")}
               </button>
               <button
                 type="submit"
                 disabled={isPendingAdd}
                 className="inline-flex items-center justify-center text-xs font-medium bg-accent text-accent-foreground hover:bg-accent-hover px-4 py-2 rounded-md transition-colors disabled:opacity-50"
               >
-                {isPendingAdd ? "Saving..." : "Save location"}
+                {isPendingAdd ? tCommon("saving") : t("saveLocation")}
               </button>
             </div>
           </form>
@@ -274,7 +277,7 @@ export function LocationsManager({ initialLocations }: LocationsManagerProps) {
             onClick={() => setDeleteError(null)}
             className="text-danger hover:underline font-medium text-xs"
           >
-            Dismiss
+            {tCommon("dismiss")}
           </button>
         </div>
       )}
@@ -283,16 +286,15 @@ export function LocationsManager({ initialLocations }: LocationsManagerProps) {
       <div className="bg-surface border border-border rounded-md overflow-hidden">
         {initialLocations.length === 0 ? (
           <div className="p-8 text-center text-xs text-muted">
-            No location records registered yet. Use the button above to add a
-            location.
+            {t("empty")}
           </div>
         ) : (
           <div className="divide-y divide-border">
             {/* Desktop Table Header */}
             <div className="hidden md:grid md:grid-cols-12 gap-4 px-4 py-3 bg-muted-surface text-xs font-medium text-muted uppercase tracking-wider">
-              <div className="col-span-5">Name</div>
-              <div className="col-span-5">Notes</div>
-              <div className="col-span-2 text-right">Actions</div>
+              <div className="col-span-5">{tCommon("name")}</div>
+              <div className="col-span-5">{tCommon("notes")}</div>
+              <div className="col-span-2 text-end">{tCommon("actions")}</div>
             </div>
 
             {initialLocations.map((item) => {
@@ -319,7 +321,7 @@ export function LocationsManager({ initialLocations }: LocationsManagerProps) {
                           htmlFor={`edit-name-${item.id}`}
                           className="block text-[11px] font-medium text-muted mb-1"
                         >
-                          Location Name *
+                          {t("locationName")} *
                         </label>
                         <input
                           id={`edit-name-${item.id}`}
@@ -342,7 +344,7 @@ export function LocationsManager({ initialLocations }: LocationsManagerProps) {
                           htmlFor={`edit-notes-${item.id}`}
                           className="block text-[11px] font-medium text-muted mb-1"
                         >
-                          Notes
+                          {tCommon("notes")}
                         </label>
                         <input
                           id={`edit-notes-${item.id}`}
@@ -368,7 +370,7 @@ export function LocationsManager({ initialLocations }: LocationsManagerProps) {
                         className="inline-flex items-center gap-1 text-xs px-2.5 py-1.5 bg-surface text-foreground border border-border rounded-md hover:bg-muted-surface"
                       >
                         <X className="w-3.5 h-3.5" />
-                        <span>Cancel</span>
+                        <span>{tCommon("cancel")}</span>
                       </button>
                       <button
                         type="submit"
@@ -376,7 +378,7 @@ export function LocationsManager({ initialLocations }: LocationsManagerProps) {
                         className="inline-flex items-center gap-1 text-xs px-3 py-1.5 bg-accent text-accent-foreground rounded-md hover:bg-accent-hover disabled:opacity-50"
                       >
                         <Check className="w-3.5 h-3.5" />
-                        <span>{isPendingEdit ? "Saving..." : "Save"}</span>
+                        <span>{isPendingEdit ? tCommon("saving") : tCommon("save")}</span>
                       </button>
                     </div>
                   </form>
@@ -387,16 +389,15 @@ export function LocationsManager({ initialLocations }: LocationsManagerProps) {
                 return (
                   <div
                     key={item.id}
-                    className="p-4 bg-danger-subtle/50 border-l-2 border-danger space-y-2"
+                    className="p-4 bg-danger-subtle/50 border-s-2 border-danger space-y-2"
                   >
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                       <div>
                         <p className="text-xs font-semibold text-danger">
-                          Delete location &quot;{item.name}&quot;?
+                          {t("deleteConfirmationTitle", { name: item.name })}
                         </p>
                         <p className="text-[11px] text-muted mt-0.5">
-                          This action will permanently delete this record. It
-                          cannot be undone.
+                          {tCommon("deleteConfirmationWarning")}
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
@@ -406,7 +407,7 @@ export function LocationsManager({ initialLocations }: LocationsManagerProps) {
                           disabled={isPendingDelete}
                           className="text-xs px-3 py-1.5 bg-surface text-foreground border border-border rounded-md hover:bg-muted-surface"
                         >
-                          Cancel
+                          {tCommon("cancel")}
                         </button>
                         <button
                           type="button"
@@ -414,7 +415,7 @@ export function LocationsManager({ initialLocations }: LocationsManagerProps) {
                           disabled={isPendingDelete}
                           className="text-xs px-3 py-1.5 bg-danger text-accent-foreground rounded-md hover:opacity-90 disabled:opacity-50 font-medium"
                         >
-                          {isPendingDelete ? "Deleting..." : "Confirm delete"}
+                          {isPendingDelete ? tCommon("deleting") : tCommon("confirmDelete")}
                         </button>
                       </div>
                     </div>
@@ -446,19 +447,19 @@ export function LocationsManager({ initialLocations }: LocationsManagerProps) {
                       type="button"
                       onClick={() => handleStartEdit(item)}
                       className="inline-flex items-center gap-1 text-xs text-muted hover:text-foreground hover:bg-muted-surface px-2.5 py-1.5 rounded-md transition-colors"
-                      title="Edit location"
+                      title={t("editLocationTitle")}
                     >
                       <Pencil className="w-3.5 h-3.5" />
-                      <span>Edit</span>
+                      <span>{tCommon("edit")}</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => handleStartDelete(item.id)}
                       className="inline-flex items-center gap-1 text-xs text-danger hover:bg-danger-subtle px-2.5 py-1.5 rounded-md transition-colors"
-                      title="Delete location"
+                      title={t("deleteLocationTitle")}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
-                      <span>Delete</span>
+                      <span>{tCommon("delete")}</span>
                     </button>
                   </div>
                 </div>
@@ -470,3 +471,4 @@ export function LocationsManager({ initialLocations }: LocationsManagerProps) {
     </div>
   );
 }
+

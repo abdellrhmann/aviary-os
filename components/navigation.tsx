@@ -2,24 +2,26 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { LayoutDashboard, Bird, Dna, MapPin, LogOut } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { LanguageSwitcher } from "@/components/language-switcher";
 
 interface NavItem {
-  name: string;
+  key: string;
   href: string;
   icon: typeof LayoutDashboard;
 }
 
 const navItems: NavItem[] = [
-  { name: "Dashboard", href: "/", icon: LayoutDashboard },
-  { name: "Birds", href: "/birds", icon: Bird },
-  { name: "Species", href: "/species", icon: Dna },
-  { name: "Locations", href: "/locations", icon: MapPin },
+  { key: "dashboard", href: "/", icon: LayoutDashboard },
+  { key: "birds", href: "/birds", icon: Bird },
+  { key: "species", href: "/species", icon: Dna },
+  { key: "locations", href: "/locations", icon: MapPin },
 ];
 
 export function SidebarNav() {
+  const t = useTranslations("Nav");
   const pathname = usePathname();
   const router = useRouter();
 
@@ -49,7 +51,7 @@ export function SidebarNav() {
 
             return (
               <Link
-                key={item.name}
+                key={item.key}
                 href={item.href}
                 className={`flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors ${isActive
                     ? "bg-accent-subtle text-accent font-medium"
@@ -57,7 +59,7 @@ export function SidebarNav() {
                   }`}
               >
                 <Icon className="w-4 h-4 shrink-0" />
-                <span>{item.name}</span>
+                <span>{t(item.key)}</span>
               </Link>
             );
           })}
@@ -71,7 +73,7 @@ export function SidebarNav() {
             className="flex items-center gap-3 w-full px-3 py-2 text-sm text-muted hover:text-foreground hover:bg-muted-surface rounded-md transition-colors text-start"
           >
             <LogOut className="w-4 h-4 shrink-0" />
-            <span>Log out</span>
+            <span>{t("logout")}</span>
           </button>
         </div>
       </div>
@@ -80,6 +82,8 @@ export function SidebarNav() {
 }
 
 export function MobileHeader() {
+  const t = useTranslations("Nav");
+
   return (
     <header className="md:hidden sticky top-0 z-40 flex items-center justify-between h-14 px-4 bg-surface border-b border-border">
       <span className="text-sm font-semibold tracking-tight text-foreground">
@@ -92,7 +96,7 @@ export function MobileHeader() {
           className="flex items-center gap-1.5 text-xs text-muted hover:text-foreground px-2.5 py-1.5 rounded-sm border border-border bg-surface"
         >
           <LogOut className="w-3.5 h-3.5" />
-          <span>Log out</span>
+          <span>{t("logout")}</span>
         </Link>
       </div>
     </header>
@@ -100,10 +104,11 @@ export function MobileHeader() {
 }
 
 export function MobileBottomNav() {
+  const t = useTranslations("Nav");
   const pathname = usePathname();
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-surface border-t border-border">
+    <nav className="md:hidden fixed bottom-0 start-0 end-0 z-50 bg-surface border-t border-border">
       <div className="grid grid-cols-4 h-14">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -114,7 +119,7 @@ export function MobileBottomNav() {
 
           return (
             <Link
-              key={item.name}
+              key={item.key}
               href={item.href}
               className={`flex flex-col items-center justify-center gap-1 py-1 text-xs transition-colors ${isActive
                   ? "text-accent font-medium"
@@ -122,7 +127,7 @@ export function MobileBottomNav() {
                 }`}
             >
               <Icon className="w-4 h-4 shrink-0" />
-              <span className="text-[11px] leading-tight">{item.name}</span>
+              <span className="text-[11px] leading-tight">{t(item.key)}</span>
             </Link>
           );
         })}

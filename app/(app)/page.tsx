@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Bird, ArrowRight, Plus } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
+  const t = await getTranslations("Dashboard");
 
   const {
     data: { user },
@@ -63,47 +65,47 @@ export default async function DashboardPage() {
     <div className="space-y-6">
       <div className="border-b border-border pb-4">
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          Dashboard
+          {t("title")}
         </h1>
         <p className="text-sm text-muted mt-1">
-          Summary and status of your aviary records.
+          {t("subtitle")}
         </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-surface border border-border rounded-md p-4">
           <div className="text-xs font-medium text-muted uppercase tracking-wider">
-            Total Birds
+            {t("totalBirds")}
           </div>
           <div className="text-2xl font-semibold text-foreground mt-2">
             {birdCount}
           </div>
           <div className="text-xs text-muted mt-1">
-            Registered active birds
+            {t("totalBirdsDesc")}
           </div>
         </div>
 
         <div className="bg-surface border border-border rounded-md p-4">
           <div className="text-xs font-medium text-muted uppercase tracking-wider">
-            Species in Use
+            {t("speciesInUse")}
           </div>
           <div className="text-2xl font-semibold text-foreground mt-2">
             {speciesInUseCount}
           </div>
           <div className="text-xs text-muted mt-1">
-            Represented in flock
+            {t("speciesInUseDesc")}
           </div>
         </div>
 
         <div className="bg-surface border border-border rounded-md p-4">
           <div className="text-xs font-medium text-muted uppercase tracking-wider">
-            Locations
+            {t("locations")}
           </div>
           <div className="text-2xl font-semibold text-foreground mt-2">
             {locationCount}
           </div>
           <div className="text-xs text-muted mt-1">
-            Active enclosures
+            {t("locationsDesc")}
           </div>
         </div>
       </div>
@@ -112,30 +114,30 @@ export default async function DashboardPage() {
       <div className="bg-surface border border-border rounded-md p-4 sm:p-5">
         <div className="border-b border-border pb-3 mb-4">
           <h2 className="text-xs font-medium text-muted uppercase tracking-wider">
-            Flock Status Breakdown
+            {t("statusBreakdown")}
           </h2>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div className="p-3 rounded-md bg-muted-surface border border-border">
-            <span className="text-xs text-muted block">Active</span>
+            <span className="text-xs text-muted block">{t("active")}</span>
             <span className="text-lg font-semibold text-foreground mt-1 block">
               {statusCounts.active}
             </span>
           </div>
           <div className="p-3 rounded-md bg-muted-surface border border-border">
-            <span className="text-xs text-muted block">Sold</span>
+            <span className="text-xs text-muted block">{t("sold")}</span>
             <span className="text-lg font-semibold text-foreground mt-1 block">
               {statusCounts.sold}
             </span>
           </div>
           <div className="p-3 rounded-md bg-muted-surface border border-border">
-            <span className="text-xs text-muted block">Deceased</span>
+            <span className="text-xs text-muted block">{t("deceased")}</span>
             <span className="text-lg font-semibold text-foreground mt-1 block">
               {statusCounts.deceased}
             </span>
           </div>
           <div className="p-3 rounded-md bg-muted-surface border border-border">
-            <span className="text-xs text-muted block">Transferred</span>
+            <span className="text-xs text-muted block">{t("transferred")}</span>
             <span className="text-lg font-semibold text-foreground mt-1 block">
               {statusCounts.transferred}
             </span>
@@ -148,10 +150,10 @@ export default async function DashboardPage() {
         <div className="flex items-center justify-between pb-4 border-b border-border">
           <div>
             <h2 className="text-sm font-semibold text-foreground">
-              Bird Registry
+              {t("registryTitle")}
             </h2>
             <p className="text-xs text-muted mt-0.5">
-              Current inventory and records.
+              {t("registrySubtitle")}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -160,14 +162,14 @@ export default async function DashboardPage() {
               className="inline-flex items-center gap-1.5 text-xs font-medium bg-accent text-accent-foreground hover:bg-accent-hover px-2.5 py-1.5 rounded-md transition-colors"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>Add bird</span>
+              <span>{t("addBird")}</span>
             </Link>
             <Link
               href="/birds"
               className="inline-flex items-center gap-1.5 text-xs font-medium text-accent hover:underline px-2 py-1.5"
             >
-              <span>View all</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <span>{t("viewAll")}</span>
+              <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
             </Link>
           </div>
         </div>
@@ -176,37 +178,40 @@ export default async function DashboardPage() {
           <div className="py-8 text-center">
             <Bird className="w-8 h-8 text-muted mx-auto mb-2 opacity-60" />
             <p className="text-sm text-foreground font-medium">
-              No bird records found
+              {t("emptyTitle")}
             </p>
             <p className="text-xs text-muted mt-1 max-w-sm mx-auto">
-              Get started by adding your first bird profile to track lineage, band identifiers, and enclosures.
+              {t("emptyDescription")}
             </p>
             <div className="mt-4">
               <Link
                 href="/birds/new"
                 className="inline-flex items-center text-xs font-medium bg-accent text-accent-foreground hover:bg-accent-hover px-3 py-1.5 rounded-md transition-colors"
               >
-                Add your first bird
+                {t("addFirstBird")}
               </Link>
             </div>
           </div>
         ) : (
-          <div className="py-6 text-center sm:text-left">
+          <div className="py-6 text-center sm:text-start">
             <p className="text-sm text-foreground">
-              You have {birdCount} registered bird{birdCount === 1 ? "" : "s"} across {speciesInUseCount} species.
+              {t("summary", {
+                birds: birdCount,
+                species: speciesInUseCount,
+              })}
             </p>
             <div className="mt-3 flex flex-wrap gap-2 justify-center sm:justify-start">
               <Link
                 href="/birds"
                 className="inline-flex items-center gap-1 text-xs font-medium bg-muted-surface hover:bg-border text-foreground px-3 py-1.5 rounded-md border border-border transition-colors"
               >
-                Browse Registry
+                {t("browseRegistry")}
               </Link>
               <Link
                 href="/birds/new"
                 className="inline-flex items-center gap-1 text-xs font-medium bg-accent text-accent-foreground hover:bg-accent-hover px-3 py-1.5 rounded-md transition-colors"
               >
-                Register New Bird
+                {t("registerNewBird")}
               </Link>
             </div>
           </div>
@@ -215,3 +220,4 @@ export default async function DashboardPage() {
     </div>
   );
 }
+

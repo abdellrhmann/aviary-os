@@ -17,5 +17,37 @@
         "haveAccount": "Already have an account? Sign in",
         "registrationSubmitted": "Registration submitted. If email confirmation is required, please verify your email before signing in.",
         "unexpectedError": "An unexpected error occurred during authentication."
+    },
+    "Nav": {
+        "dashboard": "Dashboard",
+        "birds": "Birds",
+        "species": "Species",
+        "locations": "Locations",
+        "logout": "Log out"
+    },
+    "Dashboard": {
+        "title": "Dashboard",
+        "subtitle": "Summary and status of your aviary records.",
+        "totalBirds": "Total Birds",
+        "totalBirdsDesc": "Registered active birds",
+        "speciesInUse": "Species in Use",
+        "speciesInUseDesc": "Represented in flock",
+        "locations": "Locations",
+        "locationsDesc": "Active enclosures",
+        "statusBreakdown": "Flock Status Breakdown",
+        "active": "Active",
+        "sold": "Sold",
+        "deceased": "Deceased",
+        "transferred": "Transferred",
+        "registryTitle": "Bird Registry",
+        "registrySubtitle": "Current inventory and records.",
+        "addBird": "Add bird",
+        "viewAll": "View all",
+        "emptyTitle": "No bird records found",
+        "emptyDescription": "Get started by adding your first bird profile to track lineage, band identifiers, and enclosures.",
+        "addFirstBird": "Add your first bird",
+        "summary": "You have {birds, plural, =1 {1 registered bird} other {# registered birds}} across {species} species.",
+        "browseRegistry": "Browse Registry",
+        "registerNewBird": "Register New Bird"
     }
 }

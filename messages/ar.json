@@ -17,5 +17,37 @@
         "haveAccount": "لديك حساب بالفعل؟ سجّل الدخول",
         "registrationSubmitted": "تم إرسال طلب التسجيل. إذا كان تأكيد البريد الإلكتروني مطلوباً، يرجى تأكيد بريدك الإلكتروني قبل تسجيل الدخول.",
         "unexpectedError": "حدث خطأ غير متوقع أثناء المصادقة."
+    },
+    "Nav": {
+        "dashboard": "لوحة التحكم",
+        "birds": "الطيور",
+        "species": "الأنواع",
+        "locations": "الأماكن",
+        "logout": "تسجيل الخروج"
+    },
+    "Dashboard": {
+        "title": "لوحة التحكم",
+        "subtitle": "ملخص وحالة سجلات الطيور الخاصة بك.",
+        "totalBirds": "إجمالي الطيور",
+        "totalBirdsDesc": "الطيور النشطة المسجلة",
+        "speciesInUse": "الأنواع قيد الاستخدام",
+        "speciesInUseDesc": "الممثلة في السرب",
+        "locations": "الأماكن",
+        "locationsDesc": "الحظائر النشطة",
+        "statusBreakdown": "تفصيل حالة السرب",
+        "active": "نشط",
+        "sold": "مباع",
+        "deceased": "نافق",
+        "transferred": "منقول",
+        "registryTitle": "سجل الطيور",
+        "registrySubtitle": "المخزون والسجلات الحالية.",
+        "addBird": "إضافة طائر",
+        "viewAll": "عرض الكل",
+        "emptyTitle": "لم يتم العثور على سجلات للطيور",
+        "emptyDescription": "ابدأ بإضافة أول ملف تعريف لطائر لتتبع النسب وحلقات التعريف والحظائر.",
+        "addFirstBird": "أضف طائرك الأول",
+        "summary": "لديك {birds, plural, =1 {طائر واحد مسجل} =2 {طائران مسجلان} few {# طيور مسجلة} many {# طائراً مسجلاً} other {# طائر مسجل}} عبر {species, plural, =1 {نوع واحد} =2 {نوعين} few {# أنواع} many {# نوعاً} other {# نوع}}.",
+        "browseRegistry": "تصفح السجل",
+        "registerNewBird": "تسجيل طائر جديد"
     }
-}
+}

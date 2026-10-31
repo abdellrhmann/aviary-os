@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AlertCircle, AlertTriangle, ArrowLeft } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { Bird } from "@/lib/validation/birds";
 import { createBirdAction, updateBirdAction } from "./actions";
 
@@ -30,6 +31,9 @@ export function BirdForm({
   candidateParents,
   isEdit = false,
 }: BirdFormProps) {
+  const t = useTranslations("BirdForm");
+  const tBirds = useTranslations("Birds");
+  const tCommon = useTranslations("Common");
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -82,12 +86,20 @@ export function BirdForm({
   // Warnings for non-standard parent sexes
   const sireSexWarning =
     selectedSire && selectedSire.sex !== "male"
-      ? `Notice: The selected sire is recorded as ${selectedSire.sex}, not male.`
+      ? t("parentSexWarningNotice", {
+          role: t("sireLabel"),
+          sex: tBirds(`sex.${selectedSire.sex}`),
+          expected: tBirds("sex.male"),
+        })
       : null;
 
   const damSexWarning =
     selectedDam && selectedDam.sex !== "female"
-      ? `Notice: The selected dam is recorded as ${selectedDam.sex}, not female.`
+      ? t("parentSexWarningNotice", {
+          role: t("damLabel"),
+          sex: tBirds(`sex.${selectedDam.sex}`),
+          expected: tBirds("sex.female"),
+        })
       : null;
 
   function handleStatusChange(
@@ -184,10 +196,10 @@ export function BirdForm({
       <div className="bg-surface border border-border rounded-md p-4 sm:p-5 space-y-4">
         <div className="border-b border-border pb-3">
           <h2 className="text-sm font-semibold text-foreground">
-            Identification & Taxonomy
+            {t("sectionIdentificationTitle")}
           </h2>
           <p className="text-xs text-muted mt-0.5">
-            Core taxonomic classification and band numbers.
+            {t("sectionIdentificationDesc")}
           </p>
         </div>
 
@@ -197,20 +209,20 @@ export function BirdForm({
             htmlFor="bird-species"
             className="block text-xs font-medium text-foreground mb-1"
           >
-            Species <span className="text-danger">*</span>
+            {t("speciesRequired")}
           </label>
           {speciesList.length === 0 ? (
             <div className="p-3 rounded-md border border-border bg-muted-surface text-xs text-foreground">
-              <p className="font-medium">No species configured yet.</p>
+              <p className="font-medium">{t("noSpeciesTitle")}</p>
               <p className="text-muted mt-1">
-                You must register at least one species before adding birds.
+                {t("noSpeciesDesc")}
               </p>
               <div className="mt-2">
                 <Link
                   href="/species"
                   className="text-xs font-medium text-accent hover:underline"
                 >
-                  Go to Species to add one
+                  {t("noSpeciesLink")}
                 </Link>
               </div>
             </div>
@@ -222,7 +234,7 @@ export function BirdForm({
               onChange={(e) => setSpeciesId(e.target.value)}
               className="w-full text-sm px-3 py-2 bg-surface border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent"
             >
-              <option value="">Select a species...</option>
+              <option value="">{t("speciesPlaceholder")}</option>
               {speciesList.map((sp) => (
                 <option key={sp.id} value={sp.id}>
                   {sp.common_name}
@@ -243,7 +255,7 @@ export function BirdForm({
               htmlFor="bird-name"
               className="block text-xs font-medium text-foreground mb-1"
             >
-              Bird Name
+              {t("nameLabel")}
             </label>
             <input
               id="bird-name"
@@ -251,7 +263,7 @@ export function BirdForm({
               maxLength={100}
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Sunny or Bluey"
+              placeholder={t("namePlaceholder")}
               className="w-full text-sm px-3 py-2 bg-surface border border-border rounded-md text-foreground placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent"
             />
             {fieldErrors.name && (
@@ -266,15 +278,16 @@ export function BirdForm({
               htmlFor="bird-ring-number"
               className="block text-xs font-medium text-foreground mb-1"
             >
-              Ring / Band Number
+              {t("ringNumberLabel")}
             </label>
             <input
               id="bird-ring-number"
               type="text"
+              dir="ltr"
               maxLength={50}
               value={ringNumber}
               onChange={(e) => setRingNumber(e.target.value)}
-              placeholder="e.g. AVI-2024-042"
+              placeholder={t("ringNumberPlaceholder")}
               className="w-full text-sm px-3 py-2 bg-surface border border-border rounded-md text-foreground placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent"
             />
             {fieldErrors.ring_number && (
@@ -291,7 +304,7 @@ export function BirdForm({
               htmlFor="bird-variety"
               className="block text-xs font-medium text-foreground mb-1"
             >
-              Variety / Color Mutation
+              {t("varietyLabel")}
             </label>
             <input
               id="bird-variety"
@@ -299,7 +312,7 @@ export function BirdForm({
               maxLength={100}
               value={variety}
               onChange={(e) => setVariety(e.target.value)}
-              placeholder="e.g. Opaline, Normal Grey, Lutino"
+              placeholder={t("varietyPlaceholder")}
               className="w-full text-sm px-3 py-2 bg-surface border border-border rounded-md text-foreground placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent"
             />
             {fieldErrors.variety && (
@@ -314,7 +327,7 @@ export function BirdForm({
               htmlFor="bird-sex"
               className="block text-xs font-medium text-foreground mb-1"
             >
-              Sex
+              {t("sexLabel")}
             </label>
             <select
               id="bird-sex"
@@ -324,9 +337,9 @@ export function BirdForm({
               }
               className="w-full text-sm px-3 py-2 bg-surface border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent"
             >
-              <option value="unknown">Unknown</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
+              <option value="unknown">{tBirds("sex.unknown")}</option>
+              <option value="male">{tBirds("sex.male")}</option>
+              <option value="female">{tBirds("sex.female")}</option>
             </select>
             {fieldErrors.sex && (
               <p className="text-xs text-danger mt-1">{fieldErrors.sex[0]}</p>
@@ -339,10 +352,10 @@ export function BirdForm({
       <div className="bg-surface border border-border rounded-md p-4 sm:p-5 space-y-4">
         <div className="border-b border-border pb-3">
           <h2 className="text-sm font-semibold text-foreground">
-            Dates & Acquisition
+            {t("sectionDatesTitle")}
           </h2>
           <p className="text-xs text-muted mt-0.5">
-            Hatch record, acquisition history, and enclosure assignment.
+            {t("sectionDatesDesc")}
           </p>
         </div>
 
@@ -352,11 +365,12 @@ export function BirdForm({
               htmlFor="bird-hatch-date"
               className="block text-xs font-medium text-foreground mb-1"
             >
-              Hatch Date
+              {t("hatchDateLabel")}
             </label>
             <input
               id="bird-hatch-date"
               type="date"
+              dir="ltr"
               max={todayStr}
               value={hatchDate}
               onChange={(e) => setHatchDate(e.target.value)}
@@ -374,7 +388,7 @@ export function BirdForm({
                 htmlFor="bird-hatch-date-estimated"
                 className="text-xs text-muted cursor-pointer"
               >
-                Hatch date is estimated
+                {t("hatchDateEstimatedLabel")}
               </label>
             </div>
             {fieldErrors.hatch_date && (
@@ -389,11 +403,12 @@ export function BirdForm({
               htmlFor="bird-acquired-on"
               className="block text-xs font-medium text-foreground mb-1"
             >
-              Acquisition Date
+              {t("acquisitionDateLabel")}
             </label>
             <input
               id="bird-acquired-on"
               type="date"
+              dir="ltr"
               value={acquiredOn}
               onChange={(e) => setAcquiredOn(e.target.value)}
               className="w-full text-sm px-3 py-2 bg-surface border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent"
@@ -412,7 +427,7 @@ export function BirdForm({
               htmlFor="bird-source"
               className="block text-xs font-medium text-foreground mb-1"
             >
-              Source / Origin
+              {t("sourceLabel")}
             </label>
             <input
               id="bird-source"
@@ -420,7 +435,7 @@ export function BirdForm({
               maxLength={100}
               value={source}
               onChange={(e) => setSource(e.target.value)}
-              placeholder="e.g. Bred in-house, Breeder Name, Import"
+              placeholder={t("sourcePlaceholder")}
               className="w-full text-sm px-3 py-2 bg-surface border border-border rounded-md text-foreground placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent"
             />
             {fieldErrors.source && (
@@ -435,7 +450,7 @@ export function BirdForm({
               htmlFor="bird-location"
               className="block text-xs font-medium text-foreground mb-1"
             >
-              Location / Enclosure
+              {t("locationLabel")}
             </label>
             <select
               id="bird-location"
@@ -443,7 +458,7 @@ export function BirdForm({
               onChange={(e) => setLocationId(e.target.value)}
               className="w-full text-sm px-3 py-2 bg-surface border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent"
             >
-              <option value="">None / Unassigned</option>
+              <option value="">{t("locationNone")}</option>
               {locationsList.map((loc) => (
                 <option key={loc.id} value={loc.id}>
                   {loc.name}
@@ -463,10 +478,10 @@ export function BirdForm({
       <div className="bg-surface border border-border rounded-md p-4 sm:p-5 space-y-4">
         <div className="border-b border-border pb-3">
           <h2 className="text-sm font-semibold text-foreground">
-            Lineage & Ancestry
+            {t("sectionLineageTitle")}
           </h2>
           <p className="text-xs text-muted mt-0.5">
-            Select recorded parents from your active birds flock.
+            {t("sectionLineageDesc")}
           </p>
         </div>
 
@@ -477,12 +492,12 @@ export function BirdForm({
               htmlFor="bird-sire"
               className="block text-xs font-medium text-foreground"
             >
-              Sire (Father)
+              {t("sireLabel")}
             </label>
             {eligibleParents.length > 5 && (
               <input
                 type="text"
-                placeholder="Search sire by ring or name..."
+                placeholder={t("sireSearchPlaceholder")}
                 value={sireSearch}
                 onChange={(e) => setSireSearch(e.target.value)}
                 className="w-full text-xs px-2.5 py-1.5 bg-surface border border-border rounded-md text-foreground placeholder:text-muted mb-1 focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent"
@@ -494,11 +509,11 @@ export function BirdForm({
               onChange={(e) => setSireId(e.target.value)}
               className="w-full text-sm px-3 py-2 bg-surface border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent"
             >
-              <option value="">Unknown / None</option>
+              <option value="">{t("sireNone")}</option>
               {filteredSires.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.ring_number ? `[${p.ring_number}] ` : ""}
-                  {p.name || "Unnamed"} ({p.sex})
+                  {p.name || t("parentUnnamed")} ({tBirds(`sex.${p.sex}`)})
                 </option>
               ))}
             </select>
@@ -521,12 +536,12 @@ export function BirdForm({
               htmlFor="bird-dam"
               className="block text-xs font-medium text-foreground"
             >
-              Dam (Mother)
+              {t("damLabel")}
             </label>
             {eligibleParents.length > 5 && (
               <input
                 type="text"
-                placeholder="Search dam by ring or name..."
+                placeholder={t("damSearchPlaceholder")}
                 value={damSearch}
                 onChange={(e) => setDamSearch(e.target.value)}
                 className="w-full text-xs px-2.5 py-1.5 bg-surface border border-border rounded-md text-foreground placeholder:text-muted mb-1 focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent"
@@ -538,11 +553,11 @@ export function BirdForm({
               onChange={(e) => setDamId(e.target.value)}
               className="w-full text-sm px-3 py-2 bg-surface border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent"
             >
-              <option value="">Unknown / None</option>
+              <option value="">{t("damNone")}</option>
               {filteredDams.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.ring_number ? `[${p.ring_number}] ` : ""}
-                  {p.name || "Unnamed"} ({p.sex})
+                  {p.name || t("parentUnnamed")} ({tBirds(`sex.${p.sex}`)})
                 </option>
               ))}
             </select>
@@ -565,10 +580,10 @@ export function BirdForm({
       <div className="bg-surface border border-border rounded-md p-4 sm:p-5 space-y-4">
         <div className="border-b border-border pb-3">
           <h2 className="text-sm font-semibold text-foreground">
-            Status & Tracking
+            {t("sectionStatusTitle")}
           </h2>
           <p className="text-xs text-muted mt-0.5">
-            Current disposition in your aviary records.
+            {t("sectionStatusDesc")}
           </p>
         </div>
 
@@ -578,7 +593,7 @@ export function BirdForm({
               htmlFor="bird-status"
               className="block text-xs font-medium text-foreground mb-1"
             >
-              Status
+              {t("statusLabel")}
             </label>
             <select
               id="bird-status"
@@ -594,10 +609,10 @@ export function BirdForm({
               }
               className="w-full text-sm px-3 py-2 bg-surface border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent"
             >
-              <option value="active">Active</option>
-              <option value="sold">Sold</option>
-              <option value="deceased">Deceased</option>
-              <option value="transferred">Transferred</option>
+              <option value="active">{tBirds("status.active")}</option>
+              <option value="sold">{tBirds("status.sold")}</option>
+              <option value="deceased">{tBirds("status.deceased")}</option>
+              <option value="transferred">{tBirds("status.transferred")}</option>
             </select>
             {fieldErrors.status && (
               <p className="text-xs text-danger mt-1">
@@ -611,17 +626,18 @@ export function BirdForm({
               htmlFor="bird-status-changed-on"
               className="block text-xs font-medium text-foreground mb-1"
             >
-              Status Date
+              {t("statusDateLabel")}
             </label>
             <input
               id="bird-status-changed-on"
               type="date"
+              dir="ltr"
               value={statusChangedOn}
               onChange={(e) => setStatusChangedOn(e.target.value)}
               className="w-full text-sm px-3 py-2 bg-surface border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent"
             />
             <p className="text-[11px] text-muted mt-1">
-              Automatically set to today if left blank when status changes.
+              {t("statusDateHint")}
             </p>
             {fieldErrors.status_changed_on && (
               <p className="text-xs text-danger mt-1">
@@ -636,7 +652,7 @@ export function BirdForm({
             htmlFor="bird-notes"
             className="block text-xs font-medium text-foreground mb-1"
           >
-            Notes & Observations
+            {t("notesLabel")}
           </label>
           <textarea
             id="bird-notes"
@@ -644,7 +660,7 @@ export function BirdForm({
             maxLength={2000}
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            placeholder="Optional health records, behavioral notes, pedigree specifics..."
+            placeholder={t("notesPlaceholder")}
             className="w-full text-sm px-3 py-2 bg-surface border border-border rounded-md text-foreground placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent resize-y"
           />
           {fieldErrors.notes && (
@@ -665,8 +681,8 @@ export function BirdForm({
           }
           className="inline-flex items-center justify-center gap-1.5 text-xs font-medium bg-surface text-foreground hover:bg-muted-surface border border-border px-4 py-2 rounded-md transition-colors text-center"
         >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Cancel</span>
+          <ArrowLeft className="w-3.5 h-3.5 rtl:rotate-180" />
+          <span>{tCommon("cancel")}</span>
         </Link>
         <button
           type="submit"
@@ -674,10 +690,10 @@ export function BirdForm({
           className="inline-flex items-center justify-center text-xs font-medium bg-accent text-accent-foreground hover:bg-accent-hover disabled:opacity-50 px-4 py-2 rounded-md transition-colors"
         >
           {isPending
-            ? "Saving record..."
+            ? t("savingButton")
             : isEdit
-            ? "Update bird record"
-            : "Save bird record"}
+            ? t("updateButton")
+            : t("saveButton")}
         </button>
       </div>
     </form>

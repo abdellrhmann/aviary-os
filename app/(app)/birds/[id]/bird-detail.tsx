@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   ArrowLeft,
   Pencil,
@@ -18,7 +19,7 @@ import {
   ShieldAlert,
 } from "lucide-react";
 import type { Bird } from "@/lib/validation/birds";
-import { formatBirdAge } from "@/lib/validation/birds";
+import { getBirdAgeParts } from "@/lib/validation/birds";
 import { BirdForm } from "../bird-form";
 import { archiveBirdAction, restoreBirdAction } from "../actions";
 
@@ -43,6 +44,9 @@ export function BirdDetail({
   locationsList,
   candidateParents,
 }: BirdDetailProps) {
+  const t = useTranslations("BirdDetail");
+  const tBirds = useTranslations("Birds");
+  const tCommon = useTranslations("Common");
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
@@ -52,7 +56,29 @@ export function BirdDetail({
   const [isPendingRestore, startRestoreTransition] = useTransition();
 
   const isArchived = Boolean(bird.deleted_at);
-  const calculatedAge = formatBirdAge(bird.hatch_date);
+
+  function formatAge(hatchDate: string | null | undefined): string | null {
+    const parts = getBirdAgeParts(hatchDate);
+    if (!parts) return null;
+
+    const { years, months, days } = parts;
+    const unit = (key: "years" | "months" | "days", count: number) =>
+      tBirds(`ageUnits.${key}`, { count });
+
+    if (years > 0) {
+      return months > 0
+        ? tBirds("ageAnd", { first: unit("years", years), second: unit("months", months) })
+        : unit("years", years);
+    }
+    if (months > 0) {
+      return days > 0
+        ? tBirds("ageAnd", { first: unit("months", months), second: unit("days", days) })
+        : unit("months", months);
+    }
+    return unit("days", days);
+  }
+
+  const calculatedAge = formatAge(bird.hatch_date);
 
   function handleArchive() {
     setActionError(null);
@@ -88,12 +114,12 @@ export function BirdDetail({
             href="/birds"
             className="hover:text-foreground flex items-center gap-1"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Birds</span>
+            <ArrowLeft className="w-3.5 h-3.5 rtl:rotate-180" />
+            <span>{t("breadcrumbBirds")}</span>
           </Link>
           <span>/</span>
           <span className="text-foreground">
-            {bird.ring_number || bird.name || "Bird Profile"}
+            {bird.ring_number || bird.name || t("breadcrumbProfile")}
           </span>
         </div>
 
@@ -105,7 +131,7 @@ export function BirdDetail({
               className="inline-flex items-center gap-1.5 text-xs font-medium bg-surface text-foreground hover:bg-muted-surface border border-border px-3 py-1.5 rounded-md transition-colors"
             >
               <Pencil className="w-3.5 h-3.5" />
-              <span>Edit</span>
+              <span>{t("editButton")}</span>
             </button>
           )}
 
@@ -118,7 +144,7 @@ export function BirdDetail({
                 className="inline-flex items-center gap-1.5 text-xs font-medium bg-muted-surface hover:bg-border text-foreground px-3 py-1.5 rounded-md border border-border transition-colors disabled:opacity-50"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
-                <span>{isPendingRestore ? "Restoring..." : "Restore"}</span>
+                <span>{isPendingRestore ? t("restoringButton") : t("restoreButton")}</span>
               </button>
             ) : (
               <button
@@ -130,7 +156,7 @@ export function BirdDetail({
                 className="inline-flex items-center gap-1.5 text-xs font-medium text-danger hover:bg-danger-subtle px-3 py-1.5 rounded-md border border-danger/30 transition-colors"
               >
                 <Archive className="w-3.5 h-3.5" />
-                <span>Archive</span>
+                <span>{t("archiveButton")}</span>
               </button>
             ))}
         </div>
@@ -148,11 +174,12 @@ export function BirdDetail({
         <div className="p-4 rounded-md border border-border bg-muted-surface flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs">
           <div>
             <p className="font-semibold text-foreground">
-              Archived Record
+              {t("archivedBannerTitle")}
             </p>
             <p className="text-muted mt-0.5">
-              This bird was archived on{" "}
-              {bird.deleted_at ? bird.deleted_at.slice(0, 10) : ""}. It is hidden from standard registry lists.
+              {t("archivedBannerDesc", {
+                date: bird.deleted_at ? bird.deleted_at.slice(0, 10) : "",
+              })}
             </p>
           </div>
           <button
@@ -162,7 +189,7 @@ export function BirdDetail({
             className="inline-flex items-center justify-center gap-1.5 text-xs font-medium bg-surface text-foreground hover:bg-border border border-border px-3 py-1.5 rounded-md transition-colors"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span>Restore bird</span>
+            <span>{t("archivedBannerRestore")}</span>
           </button>
         </div>
       )}
@@ -174,10 +201,10 @@ export function BirdDetail({
             <ShieldAlert className="w-5 h-5 text-muted shrink-0 mt-0.5" />
             <div>
               <h2 className="text-sm font-semibold text-foreground">
-                Archive Bird Record
+                {t("archiveConfirmTitle")}
               </h2>
               <p className="text-xs text-muted mt-0.5">
-                Archiving removes this bird from active lists while preserving historical data.
+                {t("archiveConfirmDesc")}
               </p>
             </div>
           </div>
@@ -186,8 +213,7 @@ export function BirdDetail({
             <div className="p-3 rounded-md border border-border bg-muted-surface text-xs text-foreground flex items-start gap-2">
               <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-muted" />
               <span>
-                Notice: This bird is recorded as a parent of {offspringCount}{" "}
-                offspring. Archiving will retain lineage connections for descendants, but hide this bird from active parent pickers.
+                {t("archiveOffspringWarning", { count: offspringCount })}
               </span>
             </div>
           )}
@@ -199,7 +225,7 @@ export function BirdDetail({
               disabled={isPendingArchive}
               className="px-3 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-muted-surface"
             >
-              Cancel
+              {tCommon("cancel")}
             </button>
             <button
               type="button"
@@ -207,7 +233,7 @@ export function BirdDetail({
               disabled={isPendingArchive}
               className="px-3 py-1.5 text-xs font-medium bg-danger text-white rounded-md hover:opacity-90 disabled:opacity-50"
             >
-              {isPendingArchive ? "Archiving..." : "Confirm Archive"}
+              {isPendingArchive ? t("archivingButton") : t("archiveConfirmButton")}
             </button>
           </div>
         </div>
@@ -218,10 +244,10 @@ export function BirdDetail({
           <div className="flex items-center justify-between border-b border-border pb-3">
             <div>
               <h2 className="text-sm font-semibold text-foreground">
-                Edit Bird Record
+                {t("editSectionTitle")}
               </h2>
               <p className="text-xs text-muted mt-0.5">
-                Update identifiers, lineage, status, or location details.
+                {t("editSectionDesc")}
               </p>
             </div>
             <button
@@ -229,7 +255,7 @@ export function BirdDetail({
               onClick={() => setIsEditing(false)}
               className="text-xs text-muted hover:text-foreground"
             >
-              Cancel editing
+              {t("cancelEditing")}
             </button>
           </div>
 
@@ -249,26 +275,26 @@ export function BirdDetail({
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-xl font-semibold tracking-tight text-foreground">
-                  {bird.name || bird.ring_number || "Unnamed Bird"}
+                  {bird.name || bird.ring_number || t("unnamedBird")}
                 </h1>
                 {isArchived && (
                   <span className="text-[11px] font-medium px-2 py-0.5 rounded border border-border bg-muted-surface text-muted">
-                    Archived
+                    {tBirds("archived")}
                   </span>
                 )}
               </div>
               <p className="text-sm text-muted mt-0.5">
-                {bird.species?.common_name || "Species Unassigned"}
+                {bird.species?.common_name || tBirds("speciesUnassigned")}
                 {bird.variety ? ` • ${bird.variety}` : ""}
               </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-medium px-2.5 py-1 rounded border border-border bg-muted-surface capitalize text-foreground">
-                Status: {bird.status}
+              <span className="text-xs font-medium px-2.5 py-1 rounded border border-border bg-muted-surface text-foreground">
+                {t("statusPrefix")}{tBirds(`status.${bird.status}`)}
               </span>
-              <span className="text-xs font-medium px-2.5 py-1 rounded border border-border bg-muted-surface capitalize text-foreground">
-                Sex: {bird.sex}
+              <span className="text-xs font-medium px-2.5 py-1 rounded border border-border bg-muted-surface text-foreground">
+                {t("sexPrefix")}{tBirds(`sex.${bird.sex}`)}
               </span>
             </div>
           </div>
@@ -279,31 +305,35 @@ export function BirdDetail({
             <div className="bg-surface border border-border rounded-md p-4 sm:p-5 space-y-3">
               <div className="border-b border-border pb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted">
                 <Tag className="w-3.5 h-3.5" />
-                <span>Identification</span>
+                <span>{t("sectionIdentificationTitle")}</span>
               </div>
-              <dl className="grid grid-cols-2 gap-y-3 text-xs">
+              <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-xs">
                 <div>
-                  <dt className="text-muted">Common Name</dt>
+                  <dt className="text-muted">{t("commonNameLabel")}</dt>
                   <dd className="font-medium text-foreground mt-0.5">
-                    {bird.species?.common_name || "Not set"}
+                    {bird.species?.common_name || t("commonNameEmpty")}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-muted">Ring / Band</dt>
+                  <dt className="text-muted">{t("ringBandLabel")}</dt>
                   <dd className="font-medium text-foreground mt-0.5">
-                    {bird.ring_number || "No band recorded"}
+                    {bird.ring_number ? (
+                      <span dir="ltr">{bird.ring_number}</span>
+                    ) : (
+                      t("ringBandEmpty")
+                    )}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-muted">Variety / Mutation</dt>
+                  <dt className="text-muted">{t("varietyLabel")}</dt>
                   <dd className="font-medium text-foreground mt-0.5">
-                    {bird.variety || "None specified"}
+                    {bird.variety || t("varietyEmpty")}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-muted">Sex</dt>
-                  <dd className="font-medium text-foreground mt-0.5 capitalize">
-                    {bird.sex}
+                  <dt className="text-muted">{t("sexLabel")}</dt>
+                  <dd className="font-medium text-foreground mt-0.5">
+                    {tBirds(`sex.${bird.sex}`)}
                   </dd>
                 </div>
               </dl>
@@ -313,42 +343,46 @@ export function BirdDetail({
             <div className="bg-surface border border-border rounded-md p-4 sm:p-5 space-y-3">
               <div className="border-b border-border pb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted">
                 <Calendar className="w-3.5 h-3.5" />
-                <span>Life Stage & Age</span>
+                <span>{t("sectionLifeStageTitle")}</span>
               </div>
-              <dl className="grid grid-cols-2 gap-y-3 text-xs">
+              <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-xs">
                 <div>
-                  <dt className="text-muted">Hatch Date</dt>
+                  <dt className="text-muted">{t("hatchDateLabel")}</dt>
                   <dd className="font-medium text-foreground mt-0.5">
                     {bird.hatch_date ? (
-                      <span>
+                      <span dir="ltr" className="inline-block">
                         {bird.hatch_date}
                         {bird.hatch_date_estimated && (
-                          <span className="text-muted text-[11px] ml-1">
-                            (est.)
+                          <span className="text-muted text-[11px] ms-1">
+                            ({t("hatchDateEstimated")})
                           </span>
                         )}
                       </span>
                     ) : (
-                      "Unknown"
+                      t("hatchDateUnknown")
                     )}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-muted">Calculated Age</dt>
+                  <dt className="text-muted">{t("calculatedAgeLabel")}</dt>
                   <dd className="font-medium text-foreground mt-0.5">
-                    {calculatedAge || "N/A"}
+                    {calculatedAge || t("calculatedAgeNA")}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-muted">Acquired On</dt>
+                  <dt className="text-muted">{t("acquiredOnLabel")}</dt>
                   <dd className="font-medium text-foreground mt-0.5">
-                    {bird.acquired_on || "Not recorded"}
+                    {bird.acquired_on ? (
+                      <span dir="ltr">{bird.acquired_on}</span>
+                    ) : (
+                      t("acquiredOnEmpty")
+                    )}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-muted">Source / Origin</dt>
+                  <dt className="text-muted">{t("sourceLabel")}</dt>
                   <dd className="font-medium text-foreground mt-0.5">
-                    {bird.source || "Not recorded"}
+                    {bird.source || t("sourceEmpty")}
                   </dd>
                 </div>
               </dl>
@@ -358,11 +392,11 @@ export function BirdDetail({
             <div className="bg-surface border border-border rounded-md p-4 sm:p-5 space-y-3">
               <div className="border-b border-border pb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted">
                 <Dna className="w-3.5 h-3.5" />
-                <span>Lineage & Parents</span>
+                <span>{t("sectionLineageTitle")}</span>
               </div>
-              <dl className="grid grid-cols-2 gap-y-3 text-xs">
+              <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-xs">
                 <div>
-                  <dt className="text-muted">Sire (Father)</dt>
+                  <dt className="text-muted">{t("sireLabel")}</dt>
                   <dd className="font-medium text-foreground mt-0.5">
                     {bird.sire ? (
                       <Link
@@ -372,15 +406,15 @@ export function BirdDetail({
                         {bird.sire.ring_number
                           ? `[${bird.sire.ring_number}] `
                           : ""}
-                        {bird.sire.name || "Unnamed"}
+                        {bird.sire.name || tBirds("unnamed")}
                       </Link>
                     ) : (
-                      <span className="text-muted">Unknown / Not recorded</span>
+                      <span className="text-muted">{t("parentUnknown")}</span>
                     )}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-muted">Dam (Mother)</dt>
+                  <dt className="text-muted">{t("damLabel")}</dt>
                   <dd className="font-medium text-foreground mt-0.5">
                     {bird.dam ? (
                       <Link
@@ -390,17 +424,17 @@ export function BirdDetail({
                         {bird.dam.ring_number
                           ? `[${bird.dam.ring_number}] `
                           : ""}
-                        {bird.dam.name || "Unnamed"}
+                        {bird.dam.name || tBirds("unnamed")}
                       </Link>
                     ) : (
-                      <span className="text-muted">Unknown / Not recorded</span>
+                      <span className="text-muted">{t("parentUnknown")}</span>
                     )}
                   </dd>
                 </div>
                 <div className="col-span-2">
-                  <dt className="text-muted">Recorded Offspring</dt>
+                  <dt className="text-muted">{t("offspringLabel")}</dt>
                   <dd className="font-medium text-foreground mt-0.5">
-                    {offspringCount} descendant{offspringCount === 1 ? "" : "s"}
+                    {t("offspringCount", { count: offspringCount })}
                   </dd>
                 </div>
               </dl>
@@ -410,25 +444,29 @@ export function BirdDetail({
             <div className="bg-surface border border-border rounded-md p-4 sm:p-5 space-y-3">
               <div className="border-b border-border pb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted">
                 <MapPin className="w-3.5 h-3.5" />
-                <span>Facility & Status</span>
+                <span>{t("sectionFacilityTitle")}</span>
               </div>
-              <dl className="grid grid-cols-2 gap-y-3 text-xs">
+              <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-xs">
                 <div>
-                  <dt className="text-muted">Current Location</dt>
+                  <dt className="text-muted">{t("currentLocationLabel")}</dt>
                   <dd className="font-medium text-foreground mt-0.5">
-                    {bird.location?.name || "Unassigned"}
+                    {bird.location?.name || t("locationUnassigned")}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-muted">Status</dt>
-                  <dd className="font-medium text-foreground mt-0.5 capitalize">
-                    {bird.status}
+                  <dt className="text-muted">{t("statusLabel")}</dt>
+                  <dd className="font-medium text-foreground mt-0.5">
+                    {tBirds(`status.${bird.status}`)}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-muted">Status Changed On</dt>
+                  <dt className="text-muted">{t("statusChangedOnLabel")}</dt>
                   <dd className="font-medium text-foreground mt-0.5">
-                    {bird.status_changed_on || "Initial registration"}
+                    {bird.status_changed_on ? (
+                      <span dir="ltr">{bird.status_changed_on}</span>
+                    ) : (
+                      t("statusInitial")
+                    )}
                   </dd>
                 </div>
               </dl>
@@ -438,10 +476,10 @@ export function BirdDetail({
           {/* Notes */}
           <div className="bg-surface border border-border rounded-md p-4 sm:p-5 space-y-2">
             <div className="text-xs font-medium uppercase tracking-wider text-muted">
-              Notes & Observations
+              {t("sectionNotesTitle")}
             </div>
             <p className="text-xs text-foreground whitespace-pre-wrap leading-relaxed">
-              {bird.notes || "No notes recorded for this bird."}
+              {bird.notes || t("notesEmpty")}
             </p>
           </div>
 
@@ -450,13 +488,13 @@ export function BirdDetail({
             <span className="flex items-center gap-1">
               <Clock className="w-3 h-3" />
               <span>
-                Registered: {bird.created_at ? bird.created_at.slice(0, 10) : "N/A"}
+                {t("registeredLabel")}{bird.created_at ? bird.created_at.slice(0, 10) : t("dateNA")}
               </span>
             </span>
             <span className="flex items-center gap-1">
               <Clock className="w-3 h-3" />
               <span>
-                Last updated: {bird.updated_at ? bird.updated_at.slice(0, 10) : "N/A"}
+                {t("lastUpdatedLabel")}{bird.updated_at ? bird.updated_at.slice(0, 10) : t("dateNA")}
               </span>
             </span>
           </div>

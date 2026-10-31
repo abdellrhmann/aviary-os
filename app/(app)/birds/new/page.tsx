@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { BirdForm } from "../bird-form";
 
@@ -40,22 +41,25 @@ export default async function NewBirdPage() {
   const locationsList = locationsData || [];
   const candidateParents = candidateBirds || [];
 
+  const t = await getTranslations("BirdDetail");
+  const tBirds = await getTranslations("Birds");
+
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-12">
       <div className="border-b border-border pb-4">
         <div className="flex items-center gap-2 text-xs text-muted mb-2">
           <Link href="/birds" className="hover:text-foreground flex items-center gap-1">
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Birds</span>
+            <ArrowLeft className="w-3.5 h-3.5 rtl:rotate-180" />
+            <span>{tBirds("birds")}</span>
           </Link>
           <span>/</span>
-          <span className="text-foreground">New Record</span>
+          <span className="text-foreground">{t("newPageBreadcrumb")}</span>
         </div>
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          Register New Bird
+          {t("newPageTitle")}
         </h1>
         <p className="text-sm text-muted mt-1">
-          Add an individual bird to your registry with lineage, band, and species records.
+          {t("newPageDesc")}
         </p>
       </div>
 

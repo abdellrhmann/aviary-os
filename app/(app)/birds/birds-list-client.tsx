@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   Search,
   Plus,
@@ -13,8 +14,7 @@ import {
   X,
 } from "lucide-react";
 import type { Bird } from "@/lib/validation/birds";
-import { formatBirdAge } from "@/lib/validation/birds";
-
+import { getBirdAgeParts } from "@/lib/validation/birds";
 interface FilterState {
   search: string;
   species: string;
@@ -47,6 +47,27 @@ export function BirdsListClient({
   locationsList,
   filters,
 }: BirdsListClientProps) {
+  const t = useTranslations("Birds");
+  function formatAge(hatchDate: string | null | undefined): string | null {
+    const parts = getBirdAgeParts(hatchDate);
+    if (!parts) return null;
+
+    const { years, months, days } = parts;
+    const unit = (key: "years" | "months" | "days", count: number) =>
+      t(`ageUnits.${key}`, { count });
+
+    if (years > 0) {
+      return months > 0
+        ? t("ageAnd", { first: unit("years", years), second: unit("months", months) })
+        : unit("years", years);
+    }
+    if (months > 0) {
+      return days > 0
+        ? t("ageAnd", { first: unit("months", months), second: unit("days", days) })
+        : unit("months", months);
+    }
+    return unit("days", days);
+  }
   const router = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
@@ -107,11 +128,11 @@ export function BirdsListClient({
 
   const hasActiveFilters = Boolean(
     filters.search ||
-      filters.species ||
-      filters.status ||
-      filters.location ||
-      filters.sex ||
-      filters.archived
+    filters.species ||
+    filters.status ||
+    filters.location ||
+    filters.sex ||
+    filters.archived
   );
 
   const fromItem = totalCount === 0 ? 0 : (currentPage - 1) * pageSize + 1;
@@ -123,10 +144,10 @@ export function BirdsListClient({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border pb-4">
         <div>
           <h1 className="text-xl font-semibold tracking-tight text-foreground">
-            Bird Registry
+            {t("title")}
           </h1>
           <p className="text-sm text-muted mt-1">
-            Manage your individual birds, pedigree records, and band identifiers.
+            {t("description")}
           </p>
         </div>
         <div>
@@ -135,7 +156,7 @@ export function BirdsListClient({
             className="inline-flex items-center gap-1.5 text-xs font-medium bg-accent text-accent-foreground hover:bg-accent-hover px-3 py-2 rounded-md transition-colors"
           >
             <Plus className="w-4 h-4" />
-            <span>Add bird</span>
+            <span>{t("addBird")}</span>
           </Link>
         </div>
       </div>
@@ -146,20 +167,21 @@ export function BirdsListClient({
         <div className="flex flex-col sm:flex-row gap-2">
           <form onSubmit={handleSearchSubmit} className="flex-1 flex gap-2">
             <div className="relative flex-1">
-              <Search className="w-4 h-4 absolute left-3 top-2.5 text-muted pointer-events-none" />
+              <Search className="w-4 h-4 absolute start-3 top-2.5 text-muted pointer-events-none" />
               <input
                 type="text"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="Search by name, ring number, or variety..."
-                className="w-full pl-9 pr-3 py-1.5 text-xs bg-surface border border-border rounded-md text-foreground placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent"
+                placeholder={t("searchPlaceholder")}
+                aria-label={t("searchAria")}
+                className="w-full ps-9 pe-3 py-1.5 text-xs bg-surface border border-border rounded-md text-foreground placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent"
               />
             </div>
             <button
               type="submit"
               className="px-3 py-1.5 text-xs font-medium bg-muted-surface hover:bg-border border border-border rounded-md text-foreground transition-colors shrink-0"
             >
-              Search
+              {t("search")}
             </button>
           </form>
 
@@ -169,30 +191,30 @@ export function BirdsListClient({
             className="sm:hidden inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-border rounded-md bg-surface text-foreground"
           >
             <Filter className="w-3.5 h-3.5" />
-            <span>{showFiltersMobile ? "Hide filters" : "Filters"}</span>
+            <span>{showFiltersMobile ? t("hideFilters") : t("filters")}</span>
           </button>
         </div>
 
         {/* Filter Dropdowns (always visible on sm+, expandable on mobile) */}
         <div
-          className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2 pt-2 border-t border-border ${
-            showFiltersMobile ? "block" : "hidden sm:grid"
-          }`}
+          className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2 pt-2 border-t border-border ${showFiltersMobile ? "block" : "hidden sm:grid"
+            }`}
         >
           {/* Species Filter */}
           <div>
             <label htmlFor="filter-species" className="block text-[11px] text-muted mb-1">
-              Species
+              {t("species")}
             </label>
             <select
               id="filter-species"
               value={filters.species}
+              aria-label={t("filterSpeciesAria")}
               onChange={(e) =>
                 updateQuery({ species: e.target.value, page: 1 })
               }
               className="w-full text-xs px-2 py-1.5 bg-surface border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-accent"
             >
-              <option value="">All species</option>
+              <option value="">{t("allSpecies")}</option>
               {speciesList.map((sp) => (
                 <option key={sp.id} value={sp.id}>
                   {sp.common_name}
@@ -204,36 +226,38 @@ export function BirdsListClient({
           {/* Status Filter */}
           <div>
             <label htmlFor="filter-status" className="block text-[11px] text-muted mb-1">
-              Status
+              {t("status.label")}
             </label>
             <select
               id="filter-status"
               value={filters.status}
+              aria-label={t("filterStatusAria")}
               onChange={(e) => updateQuery({ status: e.target.value, page: 1 })}
               className="w-full text-xs px-2 py-1.5 bg-surface border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-accent"
             >
-              <option value="">All statuses</option>
-              <option value="active">Active</option>
-              <option value="sold">Sold</option>
-              <option value="deceased">Deceased</option>
-              <option value="transferred">Transferred</option>
+              <option value="">{t("status.all")}</option>
+              <option value="active">{t("status.active")}</option>
+              <option value="sold">{t("status.sold")}</option>
+              <option value="deceased">{t("status.deceased")}</option>
+              <option value="transferred">{t("status.transferred")}</option>
             </select>
           </div>
 
           {/* Location Filter */}
           <div>
             <label htmlFor="filter-location" className="block text-[11px] text-muted mb-1">
-              Location
+              {t("location")}
             </label>
             <select
               id="filter-location"
               value={filters.location}
+              aria-label={t("filterLocationAria")}
               onChange={(e) =>
                 updateQuery({ location: e.target.value, page: 1 })
               }
               className="w-full text-xs px-2 py-1.5 bg-surface border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-accent"
             >
-              <option value="">All locations</option>
+              <option value="">{t("allLocations")}</option>
               {locationsList.map((loc) => (
                 <option key={loc.id} value={loc.id}>
                   {loc.name}
@@ -245,18 +269,19 @@ export function BirdsListClient({
           {/* Sex Filter */}
           <div>
             <label htmlFor="filter-sex" className="block text-[11px] text-muted mb-1">
-              Sex
+              {t("sex.label")}
             </label>
             <select
               id="filter-sex"
               value={filters.sex}
+              aria-label={t("filterSexAria")}
               onChange={(e) => updateQuery({ sex: e.target.value, page: 1 })}
               className="w-full text-xs px-2 py-1.5 bg-surface border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-accent"
             >
-              <option value="">All sexes</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="unknown">Unknown</option>
+              <option value="">{t("sex.all")}</option>
+              <option value="male">{t("sex.male")}</option>
+              <option value="female">{t("sex.female")}</option>
+              <option value="unknown">{t("sex.unknown")}</option>
             </select>
           </div>
 
@@ -276,7 +301,7 @@ export function BirdsListClient({
                 htmlFor="filter-archived"
                 className="text-[11px] text-foreground cursor-pointer select-none"
               >
-                Include archived
+                {t("includeArchived")}
               </label>
             </div>
           </div>
@@ -285,7 +310,7 @@ export function BirdsListClient({
         {hasActiveFilters && (
           <div className="flex items-center justify-between pt-2 text-xs border-t border-border">
             <span className="text-muted">
-              Filters applied • Showing {totalCount} result{totalCount === 1 ? "" : "s"}
+              {t("filtersApplied", { count: totalCount })}
             </span>
             <button
               type="button"
@@ -293,7 +318,7 @@ export function BirdsListClient({
               className="inline-flex items-center gap-1 text-accent hover:underline text-xs"
             >
               <X className="w-3.5 h-3.5" />
-              <span>Clear filters</span>
+              <span>{t("clearFilters")}</span>
             </button>
           </div>
         )}
@@ -301,16 +326,17 @@ export function BirdsListClient({
 
       {/* Desktop Table View (hidden on small screens) */}
       <div className="hidden md:block bg-surface border border-border rounded-md overflow-hidden">
-        <table className="w-full text-left text-sm">
+        <table className="w-full text-start text-sm">
           <thead className="bg-muted-surface border-b border-border text-xs text-muted font-medium uppercase tracking-wider">
             <tr>
               <th scope="col" className="px-4 py-3">
                 <button
                   type="button"
                   onClick={() => handleSortToggle("ring_number")}
-                  className="inline-flex items-center gap-1 hover:text-foreground text-left"
+                  title={t("sortByRingNumber")}
+                  className="inline-flex items-center gap-1 hover:text-foreground text-start"
                 >
-                  <span>Band / Ring</span>
+                  <span>{t("bandRing")}</span>
                   <ArrowUpDown className="w-3 h-3 opacity-60" />
                 </button>
               </th>
@@ -318,33 +344,35 @@ export function BirdsListClient({
                 <button
                   type="button"
                   onClick={() => handleSortToggle("name")}
-                  className="inline-flex items-center gap-1 hover:text-foreground text-left"
+                  title={t("sortByName")}
+                  className="inline-flex items-center gap-1 hover:text-foreground text-start"
                 >
-                  <span>Name</span>
+                  <span>{t("name")}</span>
                   <ArrowUpDown className="w-3 h-3 opacity-60" />
                 </button>
               </th>
               <th scope="col" className="px-4 py-3">
-                Species & Variety
+                {t("speciesVariety")}
               </th>
               <th scope="col" className="px-4 py-3">
-                Sex
+                {t("sex.label")}
               </th>
               <th scope="col" className="px-4 py-3">
                 <button
                   type="button"
                   onClick={() => handleSortToggle("hatch_date")}
-                  className="inline-flex items-center gap-1 hover:text-foreground text-left"
+                  title={t("sortByHatchDate")}
+                  className="inline-flex items-center gap-1 hover:text-foreground text-start"
                 >
-                  <span>Hatch Date / Age</span>
+                  <span>{t("hatchDateAge")}</span>
                   <ArrowUpDown className="w-3 h-3 opacity-60" />
                 </button>
               </th>
               <th scope="col" className="px-4 py-3">
-                Location
+                {t("location")}
               </th>
               <th scope="col" className="px-4 py-3">
-                Status
+                {t("status.label")}
               </th>
             </tr>
           </thead>
@@ -356,13 +384,13 @@ export function BirdsListClient({
                   className="px-4 py-12 text-center text-xs text-muted"
                 >
                   {hasActiveFilters
-                    ? "No birds found matching your search or filters."
-                    : "No bird records registered yet. Use the button above to add a record."}
+                    ? t("emptyFiltered")
+                    : t("emptyDefault")}
                 </td>
               </tr>
             ) : (
               birds.map((bird) => {
-                const age = formatBirdAge(bird.hatch_date);
+                const age = formatAge(bird.hatch_date);
                 const isArchived = Boolean(bird.deleted_at);
 
                 return (
@@ -378,8 +406,8 @@ export function BirdsListClient({
                         {bird.ring_number || "—"}
                       </Link>
                       {isArchived && (
-                        <span className="ml-1.5 text-[10px] px-1.5 py-0.2 rounded border border-border bg-muted-surface text-muted">
-                          Archived
+                        <span className="ms-1.5 text-[10px] px-1.5 py-0.2 rounded border border-border bg-muted-surface text-muted">
+                          {t("archived")}
                         </span>
                       )}
                     </td>
@@ -388,7 +416,7 @@ export function BirdsListClient({
                         href={`/birds/${bird.id}`}
                         className="hover:underline font-medium text-foreground"
                       >
-                        {bird.name || "Unnamed"}
+                        {bird.name || t("unnamed")}
                       </Link>
                     </td>
                     <td className="px-4 py-3 text-xs">
@@ -403,15 +431,15 @@ export function BirdsListClient({
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-xs capitalize">
-                      {bird.sex}
+                    <td className="px-4 py-3 text-xs">
+                      {t(`sex.${bird.sex}`)}
                     </td>
                     <td className="px-4 py-3 text-xs text-muted">
                       {bird.hatch_date ? (
                         <span>
                           {bird.hatch_date}
                           {age ? ` (${age})` : ""}
-                          {bird.hatch_date_estimated ? " est." : ""}
+                          {bird.hatch_date_estimated ? ` ${t("estimatedAbbr")}` : ""}
                         </span>
                       ) : (
                         "—"
@@ -421,8 +449,8 @@ export function BirdsListClient({
                       {bird.location?.name || "—"}
                     </td>
                     <td className="px-4 py-3 text-xs">
-                      <span className="capitalize px-2 py-0.5 rounded border border-border bg-muted-surface text-[11px]">
-                        {bird.status}
+                      <span className="px-2 py-0.5 rounded border border-border bg-muted-surface text-[11px]">
+                        {t(`status.${bird.status}`)}
                       </span>
                     </td>
                   </tr>
@@ -438,12 +466,12 @@ export function BirdsListClient({
         {birds.length === 0 ? (
           <div className="bg-surface border border-border rounded-md p-6 text-center text-xs text-muted">
             {hasActiveFilters
-              ? "No birds found matching your search or filters."
-              : "No bird records registered yet. Use the button above to add a record."}
+              ? t("emptyFiltered")
+              : t("emptyDefault")}
           </div>
         ) : (
           birds.map((bird) => {
-            const age = formatBirdAge(bird.hatch_date);
+            const age = formatAge(bird.hatch_date);
             const isArchived = Boolean(bird.deleted_at);
 
             return (
@@ -456,7 +484,7 @@ export function BirdsListClient({
                   <div>
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <span className="font-semibold text-xs text-foreground">
-                        {bird.name || "Unnamed"}
+                        {bird.name || t("unnamed")}
                       </span>
                       {bird.ring_number && (
                         <span className="font-mono text-[11px] text-muted">
@@ -465,39 +493,38 @@ export function BirdsListClient({
                       )}
                       {isArchived && (
                         <span className="text-[10px] px-1.5 py-0.2 rounded border border-border bg-muted-surface text-muted">
-                          Archived
+                          {t("archived")}
                         </span>
                       )}
                     </div>
                     <p className="text-xs text-muted mt-0.5">
-                      {bird.species?.common_name || "Species Unassigned"}
+                      {bird.species?.common_name || t("speciesUnassigned")}
                       {bird.variety ? ` • ${bird.variety}` : ""}
                     </p>
                   </div>
-                  <span className="capitalize text-[11px] px-2 py-0.5 rounded border border-border bg-muted-surface shrink-0">
-                    {bird.status}
+                  <span className="text-[11px] px-2 py-0.5 rounded border border-border bg-muted-surface shrink-0">
+                    {t(`status.${bird.status}`)}
                   </span>
                 </div>
 
                 <div className="mt-3 pt-2 border-t border-border grid grid-cols-2 gap-2 text-[11px] text-muted">
                   <div>
-                    <span>Sex: </span>
-                    <span className="text-foreground capitalize">{bird.sex}</span>
+                    <span>{t("mobileSex")} </span>
+                    <span className="text-foreground">{t(`sex.${bird.sex}`)}</span>
                   </div>
                   <div>
-                    <span>Location: </span>
+                    <span>{t("mobileLocation")} </span>
                     <span className="text-foreground">
                       {bird.location?.name || "—"}
                     </span>
                   </div>
                   <div className="col-span-2">
-                    <span>Hatch: </span>
+                    <span>{t("mobileHatch")} </span>
                     <span className="text-foreground">
                       {bird.hatch_date
-                        ? `${bird.hatch_date}${age ? ` (${age})` : ""}${
-                            bird.hatch_date_estimated ? " est." : ""
-                          }`
-                        : "Unknown"}
+                        ? `${bird.hatch_date}${age ? ` (${age})` : ""}${bird.hatch_date_estimated ? ` ${t("estimatedAbbr")}` : ""
+                        }`
+                        : t("unknown")}
                     </span>
                   </div>
                 </div>
@@ -511,9 +538,11 @@ export function BirdsListClient({
       {totalCount > 0 && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted pt-2">
           <div>
-            Showing <span className="font-medium text-foreground">{fromItem}</span>–
-            <span className="font-medium text-foreground">{toItem}</span> of{" "}
-            <span className="font-medium text-foreground">{totalCount}</span> birds
+            {t("showingRange", {
+              from: fromItem,
+              to: toItem,
+              total: totalCount,
+            })}
           </div>
 
           <div className="flex items-center gap-1.5">
@@ -521,24 +550,29 @@ export function BirdsListClient({
               type="button"
               onClick={() => updateQuery({ page: currentPage - 1 })}
               disabled={currentPage <= 1 || isPending}
+              aria-label={t("previous")}
               className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md border border-border bg-surface hover:bg-muted-surface text-foreground disabled:opacity-40 disabled:pointer-events-none transition-colors"
             >
-              <ChevronLeft className="w-3.5 h-3.5" />
-              <span>Previous</span>
+              <ChevronLeft className="w-3.5 h-3.5 rtl:rotate-180" />
+              <span>{t("previous")}</span>
             </button>
 
             <span className="px-2">
-              Page {currentPage} of {totalPages}
+              {t("pageCurrentOfTotal", {
+                current: currentPage,
+                total: totalPages,
+              })}
             </span>
 
             <button
               type="button"
               onClick={() => updateQuery({ page: currentPage + 1 })}
               disabled={currentPage >= totalPages || isPending}
+              aria-label={t("next")}
               className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md border border-border bg-surface hover:bg-muted-surface text-foreground disabled:opacity-40 disabled:pointer-events-none transition-colors"
             >
-              <span>Next</span>
-              <ChevronRight className="w-3.5 h-3.5" />
+              <span>{t("next")}</span>
+              <ChevronRight className="w-3.5 h-3.5 rtl:rotate-180" />
             </button>
           </div>
         </div>

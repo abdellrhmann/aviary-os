@@ -322,10 +322,16 @@ export interface Bird {
  * Calculates human-readable age from a hatch date string.
  * Example: "2y 4m", "5m", "18d", or null if no hatch date.
  */
-export function formatBirdAge(
+export interface BirdAgeParts {
+  years: number;
+  months: number;
+  days: number;
+}
+
+export function getBirdAgeParts(
   hatchDate: string | null | undefined,
   refDate: Date = new Date()
-): string | null {
+): BirdAgeParts | null {
   if (!hatchDate || !isValidDateString(hatchDate)) return null;
 
   const [y, m, d] = hatchDate.split("-").map(Number);
@@ -350,11 +356,22 @@ export function formatBirdAge(
     months += 12;
   }
 
+  return { years, months, days: Math.max(0, days) };
+}
+
+export function formatBirdAge(
+  hatchDate: string | null | undefined,
+  refDate: Date = new Date()
+): string | null {
+  const parts = getBirdAgeParts(hatchDate, refDate);
+  if (!parts) return null;
+
+  const { years, months, days } = parts;
   if (years > 0) {
     return months > 0 ? `${years}y ${months}m` : `${years}y`;
   }
   if (months > 0) {
     return days > 0 ? `${months}m ${days}d` : `${months}m`;
   }
-  return `${Math.max(0, days)}d`;
+  return `${days}d`;
 }

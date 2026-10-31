@@ -1,9 +1,18 @@
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { escapeLikeWildcards, type Bird } from "@/lib/validation/birds";
 import { BirdsListClient } from "./birds-list-client";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata() {
+  const t = await getTranslations("Birds");
+  return {
+    title: t("title"),
+    description: t("description"),
+  };
+}
 
 interface BirdsPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;

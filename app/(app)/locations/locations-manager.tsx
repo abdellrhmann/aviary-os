@@ -17,6 +17,17 @@ interface LocationsManagerProps {
 export function LocationsManager({ initialLocations }: LocationsManagerProps) {
   const t = useTranslations("Locations");
   const tCommon = useTranslations("Common");
+  const tErrors = useTranslations("Errors");
+
+  function getErrorText(
+    result: { error?: string; errorCode?: string },
+    fallbackKey: "createError" | "updateError" | "deleteError"
+  ): string {
+    if (result.errorCode && tErrors.has(result.errorCode)) {
+      return tErrors(result.errorCode);
+    }
+    return result.error || t(fallbackKey);
+  }
 
   // Add form state
   const [showAddForm, setShowAddForm] = useState(false);
@@ -90,7 +101,7 @@ export function LocationsManager({ initialLocations }: LocationsManagerProps) {
       });
 
       if (!result.success) {
-        setAddError(result.error || t("createError"));
+        setAddError(getErrorText(result, "createError"));
         if (result.fieldErrors) {
           setAddFieldErrors(result.fieldErrors);
         }
@@ -114,7 +125,7 @@ export function LocationsManager({ initialLocations }: LocationsManagerProps) {
       });
 
       if (!result.success) {
-        setEditError(result.error || t("updateError"));
+        setEditError(getErrorText(result, "updateError"));
         if (result.fieldErrors) {
           setEditFieldErrors(result.fieldErrors);
         }
@@ -132,7 +143,7 @@ export function LocationsManager({ initialLocations }: LocationsManagerProps) {
       const result = await deleteLocationAction(id);
 
       if (!result.success) {
-        setDeleteError(result.error || t("deleteError"));
+        setDeleteError(getErrorText(result, "deleteError"));
         return;
       }
 

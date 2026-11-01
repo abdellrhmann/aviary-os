@@ -7,12 +7,17 @@ import {
   locationUpdateSchema,
   type Location,
 } from "@/lib/validation/locations";
-import { mapDatabaseError } from "@/lib/validation/errors";
+import {
+  mapDatabaseError,
+  getDatabaseErrorCode,
+  type ErrorCode,
+} from "@/lib/validation/errors";
 
 export interface ActionResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;
+  errorCode?: ErrorCode;
   fieldErrors?: Record<string, string[] | undefined>;
 }
 
@@ -30,6 +35,7 @@ export async function createLocationAction(
     return {
       success: false,
       error: "You must be signed in to perform this action.",
+      errorCode: "not_signed_in",
     };
   }
 
@@ -38,6 +44,7 @@ export async function createLocationAction(
     return {
       success: false,
       error: "Validation failed. Please correct the fields below.",
+      errorCode: "validation_failed",
       fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
@@ -55,7 +62,8 @@ export async function createLocationAction(
 
   if (error) {
     const message = mapDatabaseError(error, "location", "create");
-    return { success: false, error: message };
+    const errorCode = getDatabaseErrorCode(error, "location", "create");
+    return { success: false, error: message, errorCode };
   }
 
   revalidatePath("/locations");
@@ -76,6 +84,7 @@ export async function updateLocationAction(
     return {
       success: false,
       error: "You must be signed in to perform this action.",
+      errorCode: "not_signed_in",
     };
   }
 
@@ -84,6 +93,7 @@ export async function updateLocationAction(
     return {
       success: false,
       error: "Validation failed. Please correct the fields below.",
+      errorCode: "validation_failed",
       fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
@@ -103,7 +113,8 @@ export async function updateLocationAction(
 
   if (error) {
     const message = mapDatabaseError(error, "location", "update");
-    return { success: false, error: message };
+    const errorCode = getDatabaseErrorCode(error, "location", "update");
+    return { success: false, error: message, errorCode };
   }
 
   revalidatePath("/locations");
@@ -124,11 +135,16 @@ export async function deleteLocationAction(
     return {
       success: false,
       error: "You must be signed in to perform this action.",
+      errorCode: "not_signed_in",
     };
   }
 
   if (!id || typeof id !== "string") {
-    return { success: false, error: "Invalid location identifier." };
+    return {
+      success: false,
+      error: "Invalid location identifier.",
+      errorCode: "invalid_id",
+    };
   }
 
   // RLS ensures only records belonging to auth.uid() can be deleted.
@@ -137,7 +153,8 @@ export async function deleteLocationAction(
 
   if (error) {
     const message = mapDatabaseError(error, "location", "delete");
-    return { success: false, error: message };
+    const errorCode = getDatabaseErrorCode(error, "location", "delete");
+    return { success: false, error: message, errorCode };
   }
 
   revalidatePath("/locations");

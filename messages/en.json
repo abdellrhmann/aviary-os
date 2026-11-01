@@ -215,6 +215,20 @@
         "lastUpdatedLabel": "Last updated: ",
         "dateNA": "N/A"
     },
+    "Errors": {
+        "not_signed_in": "You must be signed in to perform this action.",
+        "validation_failed": "Validation failed. Please correct the fields below.",
+        "invalid_id": "Invalid identifier.",
+        "species_duplicate": "A species with this common name already exists.",
+        "location_duplicate": "A location with this name already exists.",
+        "bird_duplicate": "A bird with this ring number already exists.",
+        "species_in_use": "Cannot delete this species because it is currently assigned to one or more birds.",
+        "location_in_use": "Cannot delete this location because it is currently assigned to one or more birds.",
+        "bird_in_use": "Cannot delete this bird because it is referenced by other records.",
+        "reference_missing": "The selected species, location, or parent bird does not exist.",
+        "check_failed": "Validation rule check failed. Please verify the information entered.",
+        "unexpected": "An unexpected error occurred. Please try again."
+    },
     "Birds": {
         "title": "Bird Registry",
         "description": "Manage your individual birds, pedigree records, and band identifiers.",

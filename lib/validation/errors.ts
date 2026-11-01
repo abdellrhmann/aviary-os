@@ -64,3 +64,51 @@ export function mapDatabaseError(
   console.error(`Database error during ${operation} on ${entity}:`, error);
   return "An unexpected error occurred. Please try again.";
 }
+
+export type ErrorCode =
+  | "not_signed_in"
+  | "validation_failed"
+  | "invalid_id"
+  | "species_duplicate"
+  | "location_duplicate"
+  | "bird_duplicate"
+  | "species_in_use"
+  | "location_in_use"
+  | "bird_in_use"
+  | "reference_missing"
+  | "check_failed"
+  | "unexpected";
+
+/**
+ * Same classification as mapDatabaseError, but returns a stable code
+ * so the UI can translate the message into the user's language.
+ */
+export function getDatabaseErrorCode(
+  error: unknown,
+  entity: EntityType,
+  operation: OperationType = "create"
+): ErrorCode {
+  const err = error as DatabaseError | null | undefined;
+  const code = err?.code ? String(err.code) : "";
+
+  // Postgres 23505: unique_violation
+  if (code === "23505") {
+    if (entity === "species") return "species_duplicate";
+    if (entity === "location") return "location_duplicate";
+    return "bird_duplicate";
+  }
+
+  // Postgres 23503: foreign_key_violation
+  if (code === "23503") {
+    if (entity === "species") return "species_in_use";
+    if (entity === "location") return "location_in_use";
+    return operation === "delete" ? "bird_in_use" : "reference_missing";
+  }
+
+  // Postgres 23514: check_violation
+  if (code === "23514") return "check_failed";
+
+  // Unexpected errors: log details server-side only.
+  console.error(`Database error during ${operation} on ${entity}:`, error);
+  return "unexpected";
+}

@@ -7,12 +7,17 @@ import {
   speciesUpdateSchema,
   type Species,
 } from "@/lib/validation/species";
-import { mapDatabaseError } from "@/lib/validation/errors";
+import {
+  mapDatabaseError,
+  getDatabaseErrorCode,
+  type ErrorCode,
+} from "@/lib/validation/errors";
 
 export interface ActionResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;
+  errorCode?: ErrorCode;
   fieldErrors?: Record<string, string[] | undefined>;
 }
 
@@ -30,6 +35,7 @@ export async function createSpeciesAction(
     return {
       success: false,
       error: "You must be signed in to perform this action.",
+      errorCode: "not_signed_in",
     };
   }
 
@@ -38,6 +44,7 @@ export async function createSpeciesAction(
     return {
       success: false,
       error: "Validation failed. Please correct the fields below.",
+      errorCode: "validation_failed",
       fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
@@ -57,7 +64,8 @@ export async function createSpeciesAction(
 
   if (error) {
     const message = mapDatabaseError(error, "species", "create");
-    return { success: false, error: message };
+    const errorCode = getDatabaseErrorCode(error, "species", "create");
+    return { success: false, error: message, errorCode };
   }
 
   revalidatePath("/species");
@@ -78,6 +86,7 @@ export async function updateSpeciesAction(
     return {
       success: false,
       error: "You must be signed in to perform this action.",
+      errorCode: "not_signed_in",
     };
   }
 
@@ -86,6 +95,7 @@ export async function updateSpeciesAction(
     return {
       success: false,
       error: "Validation failed. Please correct the fields below.",
+      errorCode: "validation_failed",
       fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
@@ -108,7 +118,8 @@ export async function updateSpeciesAction(
 
   if (error) {
     const message = mapDatabaseError(error, "species", "update");
-    return { success: false, error: message };
+    const errorCode = getDatabaseErrorCode(error, "species", "update");
+    return { success: false, error: message, errorCode };
   }
 
   revalidatePath("/species");
@@ -129,11 +140,16 @@ export async function deleteSpeciesAction(
     return {
       success: false,
       error: "You must be signed in to perform this action.",
+      errorCode: "not_signed_in",
     };
   }
 
   if (!id || typeof id !== "string") {
-    return { success: false, error: "Invalid species identifier." };
+    return {
+      success: false,
+      error: "Invalid species identifier.",
+      errorCode: "invalid_id",
+    };
   }
 
   // RLS ensures only records belonging to auth.uid() can be deleted.
@@ -142,7 +158,8 @@ export async function deleteSpeciesAction(
 
   if (error) {
     const message = mapDatabaseError(error, "species", "delete");
-    return { success: false, error: message };
+    const errorCode = getDatabaseErrorCode(error, "species", "delete");
+    return { success: false, error: message, errorCode };
   }
 
   revalidatePath("/species");

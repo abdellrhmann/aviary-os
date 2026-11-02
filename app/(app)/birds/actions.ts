@@ -8,13 +8,19 @@ import {
   wouldCreateAncestryCycle,
   type Bird,
 } from "@/lib/validation/birds";
-import { mapDatabaseError } from "@/lib/validation/errors";
+import {
+  mapDatabaseError,
+  getDatabaseErrorCode,
+  type ErrorCode,
+} from "@/lib/validation/errors";
 
 export interface ActionResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;
+  errorCode?: ErrorCode;
   fieldErrors?: Record<string, string[] | undefined>;
+  fieldErrorCodes?: Record<string, ErrorCode | undefined>;
 }
 
 export async function createBirdAction(
@@ -31,6 +37,7 @@ export async function createBirdAction(
     return {
       success: false,
       error: "You must be signed in to perform this action.",
+      errorCode: "not_signed_in",
     };
   }
 
@@ -39,6 +46,7 @@ export async function createBirdAction(
     return {
       success: false,
       error: "Validation failed. Please correct the fields below.",
+      errorCode: "validation_failed",
       fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
@@ -60,6 +68,7 @@ export async function createBirdAction(
       return {
         success: false,
         error: "Failed to verify parent records.",
+        errorCode: "parent_verify_failed",
       };
     }
 
@@ -70,7 +79,9 @@ export async function createBirdAction(
       return {
         success: false,
         error: "Selected sire could not be found.",
+        errorCode: "sire_not_found",
         fieldErrors: { sire_id: ["Selected sire does not exist."] },
+        fieldErrorCodes: { sire_id: "sire_not_found" },
       };
     }
 
@@ -78,7 +89,9 @@ export async function createBirdAction(
       return {
         success: false,
         error: "Selected dam could not be found.",
+        errorCode: "dam_not_found",
         fieldErrors: { dam_id: ["Selected dam does not exist."] },
+        fieldErrorCodes: { dam_id: "dam_not_found" },
       };
     }
 
@@ -88,14 +101,18 @@ export async function createBirdAction(
         return {
           success: false,
           error: "Sire must be older than the offspring.",
+          errorCode: "sire_too_young",
           fieldErrors: { sire_id: ["Sire must be older than the offspring."] },
+          fieldErrorCodes: { sire_id: "sire_too_young" },
         };
       }
       if (dam?.hatch_date && dam.hatch_date >= birdData.hatch_date) {
         return {
           success: false,
           error: "Dam must be older than the offspring.",
+          errorCode: "dam_too_young",
           fieldErrors: { dam_id: ["Dam must be older than the offspring."] },
+          fieldErrorCodes: { dam_id: "dam_too_young" },
         };
       }
     }
@@ -131,7 +148,8 @@ export async function createBirdAction(
 
   if (error) {
     const message = mapDatabaseError(error, "bird", "create");
-    return { success: false, error: message };
+    const errorCode = getDatabaseErrorCode(error, "bird", "create");
+    return { success: false, error: message, errorCode };
   }
 
   revalidatePath("/birds");
@@ -153,6 +171,7 @@ export async function updateBirdAction(
     return {
       success: false,
       error: "You must be signed in to perform this action.",
+      errorCode: "not_signed_in",
     };
   }
 
@@ -161,6 +180,7 @@ export async function updateBirdAction(
     return {
       success: false,
       error: "Validation failed. Please correct the fields below.",
+      errorCode: "validation_failed",
       fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
@@ -178,6 +198,7 @@ export async function updateBirdAction(
     return {
       success: false,
       error: "Bird record not found.",
+      errorCode: "bird_not_found",
     };
   }
 
@@ -196,6 +217,7 @@ export async function updateBirdAction(
       return {
         success: false,
         error: "Failed to verify parent records.",
+        errorCode: "parent_verify_failed",
       };
     }
 
@@ -206,7 +228,9 @@ export async function updateBirdAction(
       return {
         success: false,
         error: "Selected sire could not be found.",
+        errorCode: "sire_not_found",
         fieldErrors: { sire_id: ["Selected sire does not exist."] },
+        fieldErrorCodes: { sire_id: "sire_not_found" },
       };
     }
 
@@ -214,7 +238,9 @@ export async function updateBirdAction(
       return {
         success: false,
         error: "Selected dam could not be found.",
+        errorCode: "dam_not_found",
         fieldErrors: { dam_id: ["Selected dam does not exist."] },
+        fieldErrorCodes: { dam_id: "dam_not_found" },
       };
     }
 
@@ -224,14 +250,18 @@ export async function updateBirdAction(
         return {
           success: false,
           error: "Sire must be older than the offspring.",
+          errorCode: "sire_too_young",
           fieldErrors: { sire_id: ["Sire must be older than the offspring."] },
+          fieldErrorCodes: { sire_id: "sire_too_young" },
         };
       }
       if (dam?.hatch_date && dam.hatch_date >= birdData.hatch_date) {
         return {
           success: false,
           error: "Dam must be older than the offspring.",
+          errorCode: "dam_too_young",
           fieldErrors: { dam_id: ["Dam must be older than the offspring."] },
+          fieldErrorCodes: { dam_id: "dam_too_young" },
         };
       }
     }
@@ -245,6 +275,7 @@ export async function updateBirdAction(
       return {
         success: false,
         error: "Failed to verify bird ancestry.",
+        errorCode: "ancestry_verify_failed",
       };
     }
 
@@ -265,9 +296,11 @@ export async function updateBirdAction(
       return {
         success: false,
         error: "Setting this sire would create a circular ancestry loop.",
+        errorCode: "sire_cycle",
         fieldErrors: {
           sire_id: ["Circular ancestry loop detected."],
         },
+        fieldErrorCodes: { sire_id: "sire_cycle" },
       };
     }
 
@@ -278,9 +311,11 @@ export async function updateBirdAction(
       return {
         success: false,
         error: "Setting this dam would create a circular ancestry loop.",
+        errorCode: "dam_cycle",
         fieldErrors: {
           dam_id: ["Circular ancestry loop detected."],
         },
+        fieldErrorCodes: { dam_id: "dam_cycle" },
       };
     }
   }
@@ -320,7 +355,8 @@ export async function updateBirdAction(
 
   if (error) {
     const message = mapDatabaseError(error, "bird", "update");
-    return { success: false, error: message };
+    const errorCode = getDatabaseErrorCode(error, "bird", "update");
+    return { success: false, error: message, errorCode };
   }
 
   revalidatePath("/birds");
@@ -343,11 +379,16 @@ export async function archiveBirdAction(
     return {
       success: false,
       error: "You must be signed in to perform this action.",
+      errorCode: "not_signed_in",
     };
   }
 
   if (!id || typeof id !== "string") {
-    return { success: false, error: "Invalid bird identifier." };
+    return {
+      success: false,
+      error: "Invalid bird identifier.",
+      errorCode: "invalid_id",
+    };
   }
 
   const { error } = await supabase
@@ -357,7 +398,8 @@ export async function archiveBirdAction(
 
   if (error) {
     const message = mapDatabaseError(error, "bird", "archive");
-    return { success: false, error: message };
+    const errorCode = getDatabaseErrorCode(error, "bird", "archive");
+    return { success: false, error: message, errorCode };
   }
 
   revalidatePath("/birds");
@@ -380,11 +422,16 @@ export async function restoreBirdAction(
     return {
       success: false,
       error: "You must be signed in to perform this action.",
+      errorCode: "not_signed_in",
     };
   }
 
   if (!id || typeof id !== "string") {
-    return { success: false, error: "Invalid bird identifier." };
+    return {
+      success: false,
+      error: "Invalid bird identifier.",
+      errorCode: "invalid_id",
+    };
   }
 
   const { error } = await supabase
@@ -394,7 +441,8 @@ export async function restoreBirdAction(
 
   if (error) {
     const message = mapDatabaseError(error, "bird", "restore");
-    return { success: false, error: message };
+    const errorCode = getDatabaseErrorCode(error, "bird", "restore");
+    return { success: false, error: message, errorCode };
   }
 
   revalidatePath("/birds");

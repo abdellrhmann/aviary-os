@@ -47,6 +47,17 @@ export function BirdDetail({
   const t = useTranslations("BirdDetail");
   const tBirds = useTranslations("Birds");
   const tCommon = useTranslations("Common");
+  const tErrors = useTranslations("Errors");
+
+  function getErrorText(
+    result: { error?: string; errorCode?: string },
+    fallbackKey: "archiveError" | "restoreError"
+  ): string {
+    if (result.errorCode && tErrors.has(result.errorCode)) {
+      return tErrors(result.errorCode);
+    }
+    return result.error || t(fallbackKey);
+  }
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
@@ -85,7 +96,7 @@ export function BirdDetail({
     startArchiveTransition(async () => {
       const result = await archiveBirdAction(bird.id);
       if (!result.success) {
-        setActionError(result.error || "Failed to archive bird.");
+        setActionError(getErrorText(result, "archiveError"));
         return;
       }
       setShowArchiveConfirm(false);
@@ -98,7 +109,7 @@ export function BirdDetail({
     startRestoreTransition(async () => {
       const result = await restoreBirdAction(bird.id);
       if (!result.success) {
-        setActionError(result.error || "Failed to restore bird.");
+        setActionError(getErrorText(result, "restoreError"));
         return;
       }
       router.refresh();

@@ -153,7 +153,8 @@
         "cancelButton": "Cancel",
         "saveButton": "Save bird record",
         "updateButton": "Update bird record",
-        "savingButton": "Saving record..."
+        "savingButton": "Saving record...",
+        "saveError": "Failed to save bird record."
     },
     "BirdDetail": {
         "breadcrumbBirds": "Birds",
@@ -176,6 +177,8 @@
         "archiveOffspringWarning": "Notice: This bird is recorded as a parent of {count, plural, =1 {1 offspring} other {# offspring}}. Archiving will retain lineage connections for descendants, but hide this bird from active parent pickers.",
         "archiveConfirmButton": "Confirm Archive",
         "archivingButton": "Archiving...",
+        "archiveError": "Failed to archive bird.",
+        "restoreError": "Failed to restore bird.",
         "unnamedBird": "Unnamed Bird",
         "statusPrefix": "Status: ",
         "sexPrefix": "Sex: ",
@@ -227,6 +230,15 @@
         "bird_in_use": "Cannot delete this bird because it is referenced by other records.",
         "reference_missing": "The selected species, location, or parent bird does not exist.",
         "check_failed": "Validation rule check failed. Please verify the information entered.",
+        "parent_verify_failed": "Failed to verify parent records.",
+        "sire_not_found": "The selected sire does not exist.",
+        "dam_not_found": "The selected dam does not exist.",
+        "sire_too_young": "The sire must be older than the offspring.",
+        "dam_too_young": "The dam must be older than the offspring.",
+        "sire_cycle": "Setting this sire would create a circular ancestry loop.",
+        "dam_cycle": "Setting this dam would create a circular ancestry loop.",
+        "ancestry_verify_failed": "Failed to verify bird ancestry.",
+        "bird_not_found": "Bird record not found.",
         "unexpected": "An unexpected error occurred. Please try again."
     },
     "Birds": {

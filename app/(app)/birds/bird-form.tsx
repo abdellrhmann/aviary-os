@@ -34,6 +34,17 @@ export function BirdForm({
   const t = useTranslations("BirdForm");
   const tBirds = useTranslations("Birds");
   const tCommon = useTranslations("Common");
+  const tErrors = useTranslations("Errors");
+  const [fieldErrorCodes, setFieldErrorCodes] = useState<
+    Record<string, string | undefined>
+  >({});
+
+  function getErrorText(result: { error?: string; errorCode?: string }): string {
+    if (result.errorCode && tErrors.has(result.errorCode)) {
+      return tErrors(result.errorCode);
+    }
+    return result.error || t("saveError");
+  }
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -87,19 +98,19 @@ export function BirdForm({
   const sireSexWarning =
     selectedSire && selectedSire.sex !== "male"
       ? t("parentSexWarningNotice", {
-          role: t("sireLabel"),
-          sex: tBirds(`sex.${selectedSire.sex}`),
-          expected: tBirds("sex.male"),
-        })
+        role: t("sireLabel"),
+        sex: tBirds(`sex.${selectedSire.sex}`),
+        expected: tBirds("sex.male"),
+      })
       : null;
 
   const damSexWarning =
     selectedDam && selectedDam.sex !== "female"
       ? t("parentSexWarningNotice", {
-          role: t("damLabel"),
-          sex: tBirds(`sex.${selectedDam.sex}`),
-          expected: tBirds("sex.female"),
-        })
+        role: t("damLabel"),
+        sex: tBirds(`sex.${selectedDam.sex}`),
+        expected: tBirds("sex.female"),
+      })
       : null;
 
   function handleStatusChange(
@@ -115,6 +126,7 @@ export function BirdForm({
     e.preventDefault();
     setFormError(null);
     setFieldErrors({});
+    setFieldErrorCodes({});
 
     const payload = {
       species_id: speciesId,
@@ -146,10 +158,11 @@ export function BirdForm({
       }
 
       if (!result.success) {
-        setFormError(result.error || "Failed to save bird record.");
+        setFormError(getErrorText(result));
         if (result.fieldErrors) {
           setFieldErrors(result.fieldErrors);
         }
+        setFieldErrorCodes(result.fieldErrorCodes ?? {});
         return;
       }
 
@@ -525,8 +538,7 @@ export function BirdForm({
             )}
             {fieldErrors.sire_id && (
               <p className="text-xs text-danger mt-1">
-                {fieldErrors.sire_id[0]}
-              </p>
+                {fieldErrorCodes.sire_id && tErrors.has(fieldErrorCodes.sire_id) ? tErrors(fieldErrorCodes.sire_id) : fieldErrors.sire_id[0]}              </p>
             )}
           </div>
 
@@ -569,8 +581,7 @@ export function BirdForm({
             )}
             {fieldErrors.dam_id && (
               <p className="text-xs text-danger mt-1">
-                {fieldErrors.dam_id[0]}
-              </p>
+                {fieldErrorCodes.dam_id && tErrors.has(fieldErrorCodes.dam_id) ? tErrors(fieldErrorCodes.dam_id) : fieldErrors.dam_id[0]}              </p>
             )}
           </div>
         </div>
@@ -601,10 +612,10 @@ export function BirdForm({
               onChange={(e) =>
                 handleStatusChange(
                   e.target.value as
-                    | "active"
-                    | "sold"
-                    | "deceased"
-                    | "transferred"
+                  | "active"
+                  | "sold"
+                  | "deceased"
+                  | "transferred"
                 )
               }
               className="w-full text-sm px-3 py-2 bg-surface border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent"
@@ -692,8 +703,8 @@ export function BirdForm({
           {isPending
             ? t("savingButton")
             : isEdit
-            ? t("updateButton")
-            : t("saveButton")}
+              ? t("updateButton")
+              : t("saveButton")}
         </button>
       </div>
     </form>

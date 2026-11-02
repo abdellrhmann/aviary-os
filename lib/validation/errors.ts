@@ -77,8 +77,16 @@ export type ErrorCode =
   | "bird_in_use"
   | "reference_missing"
   | "check_failed"
+  | "parent_verify_failed"
+  | "sire_not_found"
+  | "dam_not_found"
+  | "sire_too_young"
+  | "dam_too_young"
+  | "sire_cycle"
+  | "dam_cycle"
+  | "ancestry_verify_failed"
+  | "bird_not_found"
   | "unexpected";
-
 /**
  * Same classification as mapDatabaseError, but returns a stable code
  * so the UI can translate the message into the user's language.

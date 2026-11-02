@@ -302,7 +302,7 @@ export function LocationsManager({ initialLocations }: LocationsManagerProps) {
         ) : (
           <div className="divide-y divide-border">
             {/* Desktop Table Header */}
-            <div className="hidden md:grid md:grid-cols-12 gap-4 px-4 py-3 bg-muted-surface text-xs font-medium text-muted uppercase tracking-wider">
+            <div className="hidden md:grid md:grid-cols-12 gap-4 px-4 py-3 bg-muted-surface text-xs font-medium text-muted uppercase tracking-wider rtl:tracking-normal">
               <div className="col-span-5">{tCommon("name")}</div>
               <div className="col-span-5">{tCommon("notes")}</div>
               <div className="col-span-2 text-end">{tCommon("actions")}</div>

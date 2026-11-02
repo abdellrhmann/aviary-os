@@ -100,6 +100,7 @@ export default function LoginPage() {
             </label>
             <input
               id="email"
+              dir="ltr"
               name="email"
               type="email"
               autoComplete="email"
@@ -120,6 +121,7 @@ export default function LoginPage() {
             </label>
             <input
               id="password"
+              dir="ltr"
               name="password"
               type="password"
               autoComplete={

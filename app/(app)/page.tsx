@@ -74,7 +74,7 @@ export default async function DashboardPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-surface border border-border rounded-md p-4">
-          <div className="text-xs font-medium text-muted uppercase tracking-wider">
+          <div className="text-xs font-medium text-muted uppercase tracking-wider rtl:tracking-normal">
             {t("totalBirds")}
           </div>
           <div className="text-2xl font-semibold text-foreground mt-2">
@@ -86,7 +86,7 @@ export default async function DashboardPage() {
         </div>
 
         <div className="bg-surface border border-border rounded-md p-4">
-          <div className="text-xs font-medium text-muted uppercase tracking-wider">
+          <div className="text-xs font-medium text-muted uppercase tracking-wider rtl:tracking-normal">
             {t("speciesInUse")}
           </div>
           <div className="text-2xl font-semibold text-foreground mt-2">
@@ -98,7 +98,7 @@ export default async function DashboardPage() {
         </div>
 
         <div className="bg-surface border border-border rounded-md p-4">
-          <div className="text-xs font-medium text-muted uppercase tracking-wider">
+          <div className="text-xs font-medium text-muted uppercase tracking-wider rtl:tracking-normal">
             {t("locations")}
           </div>
           <div className="text-2xl font-semibold text-foreground mt-2">
@@ -113,7 +113,7 @@ export default async function DashboardPage() {
       {/* Birds by Status Breakdown */}
       <div className="bg-surface border border-border rounded-md p-4 sm:p-5">
         <div className="border-b border-border pb-3 mb-4">
-          <h2 className="text-xs font-medium text-muted uppercase tracking-wider">
+          <h2 className="text-xs font-medium text-muted uppercase tracking-wider rtl:tracking-normal">
             {t("statusBreakdown")}
           </h2>
         </div>

@@ -314,7 +314,7 @@ export function BirdDetail({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Identification & Physical */}
             <div className="bg-surface border border-border rounded-md p-4 sm:p-5 space-y-3">
-              <div className="border-b border-border pb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted">
+              <div className="border-b border-border pb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-wider rtl:tracking-normal text-muted">
                 <Tag className="w-3.5 h-3.5" />
                 <span>{t("sectionIdentificationTitle")}</span>
               </div>
@@ -352,7 +352,7 @@ export function BirdDetail({
 
             {/* Life Stage & Age */}
             <div className="bg-surface border border-border rounded-md p-4 sm:p-5 space-y-3">
-              <div className="border-b border-border pb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted">
+              <div className="border-b border-border pb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-wider rtl:tracking-normal text-muted">
                 <Calendar className="w-3.5 h-3.5" />
                 <span>{t("sectionLifeStageTitle")}</span>
               </div>
@@ -401,7 +401,7 @@ export function BirdDetail({
 
             {/* Pedigree & Lineage */}
             <div className="bg-surface border border-border rounded-md p-4 sm:p-5 space-y-3">
-              <div className="border-b border-border pb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted">
+              <div className="border-b border-border pb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-wider rtl:tracking-normal text-muted">
                 <Dna className="w-3.5 h-3.5" />
                 <span>{t("sectionLineageTitle")}</span>
               </div>
@@ -453,7 +453,7 @@ export function BirdDetail({
 
             {/* Location & Tracking */}
             <div className="bg-surface border border-border rounded-md p-4 sm:p-5 space-y-3">
-              <div className="border-b border-border pb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted">
+              <div className="border-b border-border pb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-wider rtl:tracking-normal text-muted">
                 <MapPin className="w-3.5 h-3.5" />
                 <span>{t("sectionFacilityTitle")}</span>
               </div>
@@ -486,7 +486,7 @@ export function BirdDetail({
 
           {/* Notes */}
           <div className="bg-surface border border-border rounded-md p-4 sm:p-5 space-y-2">
-            <div className="text-xs font-medium uppercase tracking-wider text-muted">
+            <div className="text-xs font-medium uppercase tracking-wider rtl:tracking-normal text-muted">
               {t("sectionNotesTitle")}
             </div>
             <p className="text-xs text-foreground whitespace-pre-wrap leading-relaxed">

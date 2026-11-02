@@ -327,7 +327,7 @@ export function BirdsListClient({
       {/* Desktop Table View (hidden on small screens) */}
       <div className="hidden md:block bg-surface border border-border rounded-md overflow-hidden">
         <table className="w-full text-start text-sm">
-          <thead className="bg-muted-surface border-b border-border text-xs text-muted font-medium uppercase tracking-wider">
+          <thead className="bg-muted-surface border-b border-border text-xs text-muted font-medium uppercase tracking-wider rtl:tracking-normal">
             <tr>
               <th scope="col" className="px-4 py-3">
                 <button

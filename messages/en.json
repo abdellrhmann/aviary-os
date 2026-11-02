@@ -239,6 +239,7 @@
         "dam_cycle": "Setting this dam would create a circular ancestry loop.",
         "ancestry_verify_failed": "Failed to verify bird ancestry.",
         "bird_not_found": "Bird record not found.",
+        "hatch_after_offspring": "This bird's hatch date must be earlier than the hatch date of its offspring.",
         "unexpected": "An unexpected error occurred. Please try again."
     },
     "Birds": {

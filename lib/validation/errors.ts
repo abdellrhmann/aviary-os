@@ -86,7 +86,7 @@ export type ErrorCode =
   | "dam_cycle"
   | "ancestry_verify_failed"
   | "bird_not_found"
-  | "unexpected";
+  | "hatch_after_offspring" | "unexpected";
 /**
  * Same classification as mapDatabaseError, but returns a stable code
  * so the UI can translate the message into the user's language.

@@ -406,8 +406,7 @@ export function BirdForm({
             </div>
             {fieldErrors.hatch_date && (
               <p className="text-xs text-danger mt-1">
-                {fieldErrors.hatch_date[0]}
-              </p>
+                {fieldErrorCodes.hatch_date && tErrors.has(fieldErrorCodes.hatch_date) ? tErrors(fieldErrorCodes.hatch_date) : fieldErrors.hatch_date[0]}              </p>
             )}
           </div>
 

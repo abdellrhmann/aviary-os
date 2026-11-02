@@ -202,6 +202,42 @@ export async function updateBirdAction(
     };
   }
 
+  // A bird's hatch date must stay earlier than the hatch date of its offspring
+  if (birdData.hatch_date) {
+    const { data: offspring, error: offspringError } = await supabase
+      .from("birds")
+      .select("id, hatch_date")
+      .or(`sire_id.eq.${birdData.id},dam_id.eq.${birdData.id}`)
+      .not("hatch_date", "is", null)
+      .is("deleted_at", null);
+
+    if (offspringError) {
+      return {
+        success: false,
+        error: "Failed to verify offspring records.",
+        errorCode: "unexpected",
+      };
+    }
+
+    const conflicting = (offspring || []).some(
+      (o) => o.hatch_date && o.hatch_date <= birdData.hatch_date!
+    );
+
+    if (conflicting) {
+      return {
+        success: false,
+        error:
+          "This bird's hatch date must be earlier than the hatch date of its offspring.",
+        errorCode: "hatch_after_offspring",
+        fieldErrors: {
+          hatch_date: [
+            "This bird's hatch date must be earlier than the hatch date of its offspring.",
+          ],
+        },
+        fieldErrorCodes: { hatch_date: "hatch_after_offspring" },
+      };
+    }
+  }
   // Parents verification and circular ancestry check
   const parentIds = [birdData.sire_id, birdData.dam_id].filter(
     Boolean

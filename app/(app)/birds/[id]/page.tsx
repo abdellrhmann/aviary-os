@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { Bird } from "@/lib/validation/birds";
 import { BirdDetail } from "./bird-detail";
+import { getBirdPhotoUrls } from "../photo-actions";
 
 export const dynamic = "force-dynamic";
 
@@ -89,6 +90,11 @@ export default async function BirdProfilePage({ params }: BirdPageProps) {
     .neq("id", id)
     .order("ring_number", { ascending: true });
 
+  const photoUrls = await getBirdPhotoUrls(
+    bird.photo_path ? [bird.photo_path] : []
+  );
+  const photoUrl = bird.photo_path ? photoUrls[bird.photo_path] ?? null : null;
+
   return (
     <BirdDetail
       bird={bird as unknown as Bird}
@@ -96,6 +102,7 @@ export default async function BirdProfilePage({ params }: BirdPageProps) {
       speciesList={speciesData || []}
       locationsList={locationsData || []}
       candidateParents={candidateBirds || []}
+      photoUrl={photoUrl}
     />
   );
 }

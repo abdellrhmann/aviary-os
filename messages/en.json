@@ -218,6 +218,14 @@
         "lastUpdatedLabel": "Last updated: ",
         "dateNA": "N/A"
     },
+    "Photo": {
+        "add": "Add photo",
+        "change": "Change photo",
+        "remove": "Remove photo",
+        "uploading": "Uploading...",
+        "hint": "JPEG, PNG or WebP. The photo is resized automatically.",
+        "alt": "Photo of the bird"
+    },
     "Errors": {
         "not_signed_in": "You must be signed in to perform this action.",
         "validation_failed": "Validation failed. Please correct the fields below.",
@@ -240,6 +248,9 @@
         "ancestry_verify_failed": "Failed to verify bird ancestry.",
         "bird_not_found": "Bird record not found.",
         "hatch_after_offspring": "This bird's hatch date must be earlier than the hatch date of its offspring.",
+        "photo_invalid": "Please choose a JPEG or WebP image.",
+        "photo_too_large": "The photo is too large. The maximum size is 2 MB.",
+        "photo_upload_failed": "Could not save the photo. Please try again.",
         "unexpected": "An unexpected error occurred. Please try again."
     },
     "Birds": {

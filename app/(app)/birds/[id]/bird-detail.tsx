@@ -17,10 +17,12 @@ import {
   Tag,
   Clock,
   ShieldAlert,
+  Bird as BirdIcon,
 } from "lucide-react";
 import type { Bird } from "@/lib/validation/birds";
 import { getBirdAgeParts } from "@/lib/validation/birds";
 import { BirdForm } from "../bird-form";
+import { PhotoUpload } from "./photo-upload";
 import { archiveBirdAction, restoreBirdAction } from "../actions";
 
 interface BirdDetailProps {
@@ -28,6 +30,7 @@ interface BirdDetailProps {
   offspringCount: number;
   speciesList: Array<{ id: string; common_name: string }>;
   locationsList: Array<{ id: string; name: string }>;
+  photoUrl?: string | null;
   candidateParents: Array<{
     id: string;
     name: string | null;
@@ -43,10 +46,12 @@ export function BirdDetail({
   speciesList,
   locationsList,
   candidateParents,
+  photoUrl = null,
 }: BirdDetailProps) {
   const t = useTranslations("BirdDetail");
   const tBirds = useTranslations("Birds");
   const tCommon = useTranslations("Common");
+  const tPhoto = useTranslations("Photo");
   const tErrors = useTranslations("Errors");
 
   function getErrorText(
@@ -283,6 +288,23 @@ export function BirdDetail({
         <div className="space-y-6">
           {/* Header Summary */}
           <div className="bg-surface border border-border rounded-md p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="shrink-0 space-y-2">
+              <div className="w-28 h-28 rounded-md border border-border bg-muted-surface overflow-hidden flex items-center justify-center">
+                {photoUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={photoUrl}
+                    alt={tPhoto("alt")}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <BirdIcon className="w-8 h-8 text-muted opacity-60" />
+                )}
+              </div>
+              {!isArchived && (
+                <PhotoUpload birdId={bird.id} hasPhoto={Boolean(photoUrl)} />
+              )}
+            </div>
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-xl font-semibold tracking-tight text-foreground">

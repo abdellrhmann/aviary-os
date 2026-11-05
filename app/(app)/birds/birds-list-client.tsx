@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import type { Bird } from "@/lib/validation/birds";
 import { getBirdAgeParts } from "@/lib/validation/birds";
+import { BirdThumb } from "./bird-thumb";
 interface FilterState {
   search: string;
   species: string;
@@ -28,6 +29,7 @@ interface FilterState {
 
 interface BirdsListClientProps {
   birds: Bird[];
+  photoUrls?: Record<string, string>;
   totalCount: number;
   currentPage: number;
   pageSize: number;
@@ -38,6 +40,7 @@ interface BirdsListClientProps {
 }
 
 export function BirdsListClient({
+  photoUrls = {},
   birds,
   totalCount,
   currentPage,
@@ -412,12 +415,15 @@ export function BirdsListClient({
                       )}
                     </td>
                     <td className="px-4 py-3 text-xs">
+                      <div className="flex items-center gap-2.5">
+                      <BirdThumb size="sm" url={bird.photo_path ? photoUrls[bird.photo_path] : null} alt={bird.name || t("unnamed")} />
                       <Link
                         href={`/birds/${bird.id}`}
                         className="hover:underline font-medium text-foreground"
                       >
                         {bird.name || t("unnamed")}
                       </Link>
+                      </div>
                     </td>
                     <td className="px-4 py-3 text-xs">
                       <div>
@@ -481,6 +487,8 @@ export function BirdsListClient({
                 className="block bg-surface border border-border rounded-md p-4 hover:border-accent transition-colors"
               >
                 <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-start gap-2.5">
+                    <BirdThumb url={bird.photo_path ? photoUrls[bird.photo_path] : null} alt={bird.name || t("unnamed")} />
                   <div>
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <span className="font-semibold text-xs text-foreground">
@@ -501,6 +509,7 @@ export function BirdsListClient({
                       {bird.species?.common_name || t("speciesUnassigned")}
                       {bird.variety ? ` • ${bird.variety}` : ""}
                     </p>
+                  </div>
                   </div>
                   <span className="text-[11px] px-2 py-0.5 rounded border border-border bg-muted-surface shrink-0">
                     {t(`status.${bird.status}`)}

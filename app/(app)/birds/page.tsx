@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { escapeLikeWildcards, type Bird } from "@/lib/validation/birds";
 import { BirdsListClient } from "./birds-list-client";
+import { getBirdPhotoUrls } from "./photo-actions";
 
 export const dynamic = "force-dynamic";
 
@@ -131,6 +132,12 @@ export default async function BirdsPage({ searchParams }: BirdsPageProps) {
 
   const { data: birdsData, count: totalCount, error: birdsError } = await query;
 
+  // Short-lived signed URLs for the photos on this page (one batched request)
+  const photoPaths = ((birdsData ?? []) as unknown as Bird[])
+    .map((b) => b.photo_path)
+    .filter((path): path is string => Boolean(path));
+  const photoUrls = await getBirdPhotoUrls(photoPaths);
+
   if (birdsError) {
     console.error("Failed to load bird records:", birdsError);
   }
@@ -152,6 +159,7 @@ export default async function BirdsPage({ searchParams }: BirdsPageProps) {
   return (
     <BirdsListClient
       birds={(birdsData as unknown as Bird[]) || []}
+      photoUrls={photoUrls}
       totalCount={total}
       currentPage={currentPage}
       pageSize={pageSize}

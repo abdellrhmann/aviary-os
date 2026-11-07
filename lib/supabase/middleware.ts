@@ -9,7 +9,7 @@ export async function updateSession(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  const PUBLIC_ROUTES = ["/login"];
+  const PUBLIC_ROUTES = ["/login", "/api/keepalive"];
   const isProtectedRoute = !PUBLIC_ROUTES.includes(request.nextUrl.pathname);
 
   // If Supabase environment variables are not configured, redirect protected routes to login
